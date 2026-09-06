@@ -108,6 +108,15 @@
 <p class="small"><span class="x">✕</span> banned &nbsp; <span class="p">P</span> protected, safe from bans</p>
 <div class="poolcols" id="pools"></div>
 
+<h2>Projected six</h2>
+<p class="small">The model&rsquo;s composition distribution for each team given the current pool:
+chance each hero ends up in their fielded six, and who plays it. Bans reshape this live;
+it is the other face of the denial term.</p>
+<div class="treecols">
+  <div id="projBlue"></div>
+  <div id="projRed"></div>
+</div>
+
 <h2>Player pools</h2>
 <p class="small">Heroes each player has played this season (latest lineup, share of playtime).
 Bans against the team strike heroes out as the draft advances.</p>
@@ -181,9 +190,12 @@ Bans against the team strike heroes out as the draft advances.</p>
       <text x="470" y="335" text-anchor="middle" font-size="10.5">deny the opponent</text>
       <text x="470" y="351" text-anchor="middle" font-size="10.5">&alpha; + threat + self + series + &kappa;D + map</text>
       <text x="730" y="68"  text-anchor="middle">P(next protect)</text>
-      <text x="730" y="83"  text-anchor="middle" font-size="10">softmax over legal picks</text>
+      <text x="730" y="83"  text-anchor="middle" font-size="10">softmax, slot sharpness T</text>
       <text x="730" y="324" text-anchor="middle">P(next ban)</text>
-      <text x="730" y="339" text-anchor="middle" font-size="10">softmax over legal picks</text>
+      <text x="730" y="339" text-anchor="middle" font-size="10">softmax, slot sharpness T</text>
+      <text x="730" y="180" text-anchor="middle" font-size="10.5" font-style="italic">decision noise rises</text>
+      <text x="730" y="193" text-anchor="middle" font-size="10.5" font-style="italic">through the draft:</text>
+      <text x="730" y="206" text-anchor="middle" font-size="10.5" font-style="italic">B1 crisp, B4 diffuse</text>
       <text x="140" y="14"  font-size="10.5" font-style="italic" text-anchor="middle">protects: who they are</text>
       <text x="140" y="152" font-size="10.5" font-style="italic" text-anchor="middle">shared</text>
       <text x="140" y="254" font-size="10.5" font-style="italic" text-anchor="middle">bans: who they face</text>
@@ -192,7 +204,9 @@ Bans against the team strike heroes out as the draft advances.</p>
   <figcaption>Every feature is learned from revealed play, none is hand-labeled. Protects read the
   acting team&rsquo;s own preferences; bans price the meta, the team&rsquo;s signature bans, what the
   opponent wins with, the series so far, and what the opponent&rsquo;s compositions would lose
-  (blue box). Holdout-validated on the last 45 series.</figcaption>
+  (blue box). Each slot carries its own fitted noise scale: forecasts are sharp where drafting
+  is scripted (B1) and honestly diffuse where it is a coach&rsquo;s call (B4). Holdout-validated
+  on the last 45 series.</figcaption>
 </figure>
 
 <h2>Log</h2>
@@ -685,6 +699,45 @@ function recompute() {
     (counts.blue.safe ? ", " + counts.blue.safe + " protected" : "") + ".  " +
     teamName("red") + " " + counts.red.avail + "/" + HEROES.length +
     (counts.red.safe ? ", " + counts.red.safe + " protected" : "") + ".";
+
+  // projected six per team
+  ["blue", "red"].forEach(function (side) {
+    var holder = document.getElementById(side === "blue" ? "projBlue" : "projRed");
+    if (!MODEL) { holder.innerHTML = ""; return; }
+    var tp = teamParams(teamKey(side));
+    var oside = opp(side);
+    var pool = HEROES.filter(function (h) { return bansBy[oside].indexOf(h) < 0; });
+    var key = "proj|" + side + "|" + bansBy[oside].slice().sort().join(",") + "|" + (teamKey(side) || "?");
+    var D = denialValues(pool, tp.v, MODEL.tau, key);
+    var rows = pool.map(function (h) {
+      return { hero: h, p: 1 - Math.exp(-(D[h] || 0) / MODEL.tau) };
+    });
+    rows.sort(function (a, b) { return b.p - a.p || (a.hero < b.hero ? -1 : 1); });
+    var pools_ = MODEL.player_pools && teamKey(side) ? MODEL.player_pools[teamKey(side)] : null;
+    var used = {};
+    var cls = side === "blue" ? "sideB" : "sideR";
+    var html = '<table><tr><th colspan="3"><span class="' + cls + '">' + teamName(side) +
+      "</span> projected six</th></tr><tr><th>hero</th><th>P(in six)</th><th>player</th></tr>";
+    rows.slice(0, 8).forEach(function (r) {
+      var who = "";
+      if (pools_) {
+        var best = null, bs = 0;
+        pools_.forEach(function (pl) {
+          if (used[pl.name]) return;
+          pl.heroes.forEach(function (e) {
+            if (e[0] === r.hero && e[1] > bs) { bs = e[1]; best = pl.name; }
+          });
+        });
+        if (best) { who = best; }
+      }
+      var prot = protsBy[side].indexOf(r.hero) >= 0;
+      html += "<tr><td>" + displayName(r.hero) + (prot ? ' <span class="p">P</span>' : "") +
+        '</td><td>' + (100 * r.p).toFixed(0) + '%&ensp;<span class="bar" style="width:' +
+        Math.max(1, Math.round(r.p * 70)) + 'px"></span></td><td class="num">' + who + "</td></tr>";
+      if (who) used[who] = true;
+    });
+    holder.innerHTML = html + "</table>";
+  });
 
   // player pool trees
   ["blue", "red"].forEach(function (side) {
