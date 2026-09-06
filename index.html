@@ -618,10 +618,15 @@ function recompute() {
       var cls = a.side === "blue" ? "sideB" : "sideR";
       var prefHdr = a.kind === "ban" ? "threat" : "pref";
       var hasMap = document.getElementById("mapSel").value !== "";
-      html += '<div><table class="fc"><tr><th colspan="' + (hasMap ? 8 : 7) + '"><span class="' + cls + '">' +
+      var hasSeries = document.getElementById("prevWin").value !== "" ||
+        document.getElementById("prevBlue").value.trim() !== "" ||
+        document.getElementById("prevRed").value.trim() !== "";
+      var ncol = 5 + (hasSeries ? 1 : 0) + (a.kind === "ban" ? 1 : 0) + (hasMap ? 1 : 0);
+      html += '<div><table class="fc"><tr><th colspan="' + ncol + '"><span class="' + cls + '">' +
         teamName(a.side) + "</span> " + a.kind + " " + a.slot + " forecast</th></tr>" +
-        "<tr><th></th><th>hero</th><th>P</th><th>α</th><th>" + prefHdr + "</th><th>series</th><th>" +
-        (a.kind === "ban" ? "κD" : "") + "</th>" + (hasMap ? "<th>map</th>" : "") + "</tr>";
+        "<tr><th></th><th>hero</th><th>P</th><th>α</th><th>" + prefHdr + "</th>" +
+        (hasSeries ? "<th>series</th>" : "") +
+        (a.kind === "ban" ? "<th>κD</th>" : "") + (hasMap ? "<th>map</th>" : "") + "</tr>";
       rows.slice(0, 8).forEach(function (r, k) {
         var w = Math.max(1, Math.round(r.p * 160));
         html += '<tr class="pick" data-act="' + a.id + '" data-hero="' + r.hero + '">' +
@@ -629,8 +634,8 @@ function recompute() {
           '<td>' + (100 * r.p).toFixed(1) + '%&ensp;<span class="bar" style="width:' + w + 'px"></span></td>' +
           '<td class="num">' + r.parts.alpha.toFixed(2) + '</td>' +
           '<td class="num">' + r.parts.thr.toFixed(2) + '</td>' +
-          '<td class="num">' + (r.parts.rev ? r.parts.rev.toFixed(2) : "") + '</td>' +
-          '<td class="num">' + (a.kind === "ban" ? r.parts.den.toFixed(2) : "") + "</td>" +
+          (hasSeries ? '<td class="num">' + r.parts.rev.toFixed(2) + '</td>' : "") +
+          (a.kind === "ban" ? '<td class="num">' + r.parts.den.toFixed(2) + "</td>" : "") +
           (hasMap ? '<td class="num">' + r.parts.map.toFixed(2) + "</td>" : "") + "</tr>";
       });
       html += "</table></div>";
