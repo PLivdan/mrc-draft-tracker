@@ -131,83 +131,98 @@ Bans against the team strike heroes out as the draft advances.</p>
 
 <h2>Model</h2>
 <figure>
-  <svg viewBox="0 0 880 340" role="img"
-       aria-label="V4 pipeline: recency-weighted usage, match results, series context, map and the opponent's role-legal pool produce five features (slot habit, time-share preference, threat, series adjustment, soft denial); protects combine habit, preference, won-with and map; bans combine habit, threat, series, denial and map; each feeds a softmax over the legal picks and a Monte Carlo roll-forward.">
+  <svg viewBox="0 0 890 350" role="img"
+       aria-label="Six inputs (map pick, recency-weighted usage, match results, series context, acting team history, opponent pool) produce seven learned features (map offsets, slot habit, time-share preference, threat, series adjustment, self-habit, soft denial), which combine into the protect utility and the ban utility, each softmaxed over the legal picks and rolled forward by Monte Carlo.">
     <defs>
-      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
       </marker>
     </defs>
-    <g fill="none" stroke="currentColor" stroke-width="1.1">
-      <rect x="10"  y="30"  width="150" height="44"/>
-      <rect x="10"  y="104" width="150" height="44"/>
-      <rect x="10"  y="178" width="150" height="44"/>
-      <rect x="10"  y="252" width="150" height="44"/>
-      <rect x="230" y="10"  width="160" height="38"/>
-      <rect x="230" y="66"  width="160" height="38"/>
-      <rect x="230" y="122" width="160" height="38"/>
-      <rect x="230" y="178" width="160" height="38"/>
-      <rect x="230" y="252" width="160" height="44" style="stroke:var(--blue)" stroke-width="1.8"/>
-      <rect x="470" y="52"  width="180" height="56"/>
-      <rect x="470" y="200" width="180" height="56"/>
-      <rect x="720" y="60"  width="150" height="40"/>
-      <rect x="720" y="208" width="150" height="40"/>
+    <g fill="none" stroke="currentColor" stroke-width="1">
+      <rect x="8"   y="20"  width="150" height="36"/>
+      <rect x="8"   y="68"  width="150" height="36"/>
+      <rect x="8"   y="116" width="150" height="36"/>
+      <rect x="8"   y="164" width="150" height="36"/>
+      <rect x="8"   y="212" width="150" height="36"/>
+      <rect x="8"   y="260" width="150" height="36"/>
+      <rect x="240" y="10"  width="180" height="36"/>
+      <rect x="240" y="58"  width="180" height="36"/>
+      <rect x="240" y="106" width="180" height="36"/>
+      <rect x="240" y="154" width="180" height="36"/>
+      <rect x="240" y="202" width="180" height="36"/>
+      <rect x="240" y="250" width="180" height="36"/>
+      <rect x="240" y="298" width="180" height="36" style="stroke:var(--blue)" stroke-width="1.6"/>
+      <rect x="520" y="72"  width="190" height="56"/>
+      <rect x="520" y="220" width="190" height="56"/>
+      <rect x="758" y="80"  width="124" height="40"/>
+      <rect x="758" y="228" width="124" height="40"/>
+      <line x1="470" y1="28" x2="470" y2="316" stroke-width="1.4"/>
     </g>
-    <g stroke="currentColor" stroke-width="1.1" marker-end="url(#arr)" fill="none">
-      <line x1="160" y1="42"  x2="228" y2="26"/>
-      <line x1="160" y1="52"  x2="228" y2="82"/>
-      <line x1="160" y1="126" x2="228" y2="136"/>
-      <line x1="160" y1="60"  x2="228" y2="130"/>
-      <line x1="160" y1="200" x2="228" y2="196"/>
-      <line x1="160" y1="274" x2="228" y2="274"/>
-      <line x1="390" y1="29"  x2="468" y2="66"/>
-      <line x1="390" y1="85"  x2="468" y2="80"/>
-      <line x1="390" y1="196" x2="468" y2="94"/>
-      <line x1="390" y1="29"  x2="468" y2="214"/>
-      <line x1="390" y1="141" x2="468" y2="228"/>
-      <line x1="390" y1="196" x2="468" y2="240"/>
-      <line x1="390" y1="274" x2="468" y2="252"/>
-      <line x1="650" y1="80"  x2="718" y2="80"/>
-      <line x1="650" y1="228" x2="718" y2="228"/>
-      <line x1="795" y1="100" x2="795" y2="206"/>
+    <g stroke="currentColor" stroke-width="0.9" marker-end="url(#arr)" fill="none">
+      <line x1="158" y1="38"  x2="238" y2="28"/>
+      <line x1="158" y1="82"  x2="238" y2="74"/>
+      <line x1="158" y1="88"  x2="238" y2="120"/>
+      <line x1="158" y1="94"  x2="238" y2="166"/>
+      <line x1="158" y1="134" x2="238" y2="176"/>
+      <line x1="158" y1="182" x2="238" y2="220"/>
+      <line x1="158" y1="230" x2="238" y2="266"/>
+      <line x1="158" y1="278" x2="238" y2="314"/>
+      <line x1="420" y1="28"  x2="466" y2="28"/>
+      <line x1="420" y1="76"  x2="466" y2="76"/>
+      <line x1="420" y1="124" x2="466" y2="124"/>
+      <line x1="420" y1="172" x2="466" y2="172"/>
+      <line x1="420" y1="220" x2="466" y2="220"/>
+      <line x1="420" y1="268" x2="466" y2="268"/>
+      <line x1="420" y1="316" x2="466" y2="316"/>
+      <line x1="470" y1="100" x2="518" y2="100"/>
+      <line x1="470" y1="248" x2="518" y2="248"/>
+      <line x1="710" y1="100" x2="756" y2="100"/>
+      <line x1="710" y1="248" x2="756" y2="248"/>
+      <line x1="820" y1="122" x2="820" y2="226"/>
     </g>
     <g font-size="12" fill="currentColor" font-family="inherit">
-      <text x="85"  y="47"  text-anchor="middle">Revealed usage</text>
-      <text x="85"  y="61"  text-anchor="middle" font-size="10.5">868 maps, 5-day memory</text>
-      <text x="85"  y="121" text-anchor="middle">Match results</text>
-      <text x="85"  y="135" text-anchor="middle" font-size="10.5">who wins with what</text>
-      <text x="85"  y="195" text-anchor="middle">Series context</text>
-      <text x="85"  y="209" text-anchor="middle" font-size="10.5">previous map, winner</text>
-      <text x="85"  y="269" text-anchor="middle">Opponent pool</text>
-      <text x="85"  y="283" text-anchor="middle" font-size="10.5">role-legal comps, 2-1-3 ok</text>
-      <text x="310" y="27"  text-anchor="middle">slot habit &alpha;</text>
-      <text x="310" y="40"  text-anchor="middle" font-size="10.5">current meta, B1&hellip;P2</text>
-      <text x="310" y="83"  text-anchor="middle">time-share preference</text>
-      <text x="310" y="96"  text-anchor="middle" font-size="10.5">minutes played = intent</text>
-      <text x="310" y="139" text-anchor="middle">threat</text>
-      <text x="310" y="152" text-anchor="middle" font-size="10.5">banned for winning, not playing</text>
-      <text x="310" y="195" text-anchor="middle">series adjustment</text>
-      <text x="310" y="208" text-anchor="middle" font-size="10.5">lost with it: less scary</text>
-      <text x="310" y="271" text-anchor="middle" style="fill:var(--blue)">soft denial D(h)</text>
-      <text x="310" y="285" text-anchor="middle" font-size="10.5" style="fill:var(--blue)">value their comps lose</text>
-      <text x="560" y="73"  text-anchor="middle">protect utility</text>
-      <text x="560" y="88"  text-anchor="middle" font-size="10.5">&alpha; + pref + won-with + map</text>
-      <text x="560" y="221" text-anchor="middle">ban utility</text>
-      <text x="560" y="236" text-anchor="middle" font-size="10.5">&alpha; + threat + series + &kappa;D + map</text>
-      <text x="795" y="78"  text-anchor="middle">P(next protect)</text>
-      <text x="795" y="92"  text-anchor="middle" font-size="10.5">softmax over legal</text>
-      <text x="795" y="226" text-anchor="middle">P(next ban)</text>
-      <text x="795" y="240" text-anchor="middle" font-size="10.5">softmax over legal</text>
-      <text x="800" y="146" font-size="10.5">Monte Carlo:</text>
-      <text x="800" y="158" font-size="10.5">roll the tree</text>
-      <text x="800" y="170" font-size="10.5">forward</text>
-      <text x="420" y="320" font-size="10.5">map offsets shift both utilities when a map is set</text>
+      <text x="83"  y="35"  text-anchor="middle">Map pick</text>
+      <text x="83"  y="83"  text-anchor="middle">Revealed usage</text>
+      <text x="83"  y="96"  text-anchor="middle" font-size="10">868 maps, 5-day memory</text>
+      <text x="83"  y="131" text-anchor="middle">Match results</text>
+      <text x="83"  y="144" text-anchor="middle" font-size="10">who wins with what</text>
+      <text x="83"  y="179" text-anchor="middle">Series context</text>
+      <text x="83"  y="192" text-anchor="middle" font-size="10">previous map, winner</text>
+      <text x="83"  y="227" text-anchor="middle">Acting team history</text>
+      <text x="83"  y="240" text-anchor="middle" font-size="10">their own past calls</text>
+      <text x="83"  y="275" text-anchor="middle">Opponent pool</text>
+      <text x="83"  y="288" text-anchor="middle" font-size="10">role-legal comps</text>
+      <text x="330" y="25"  text-anchor="middle">map offsets</text>
+      <text x="330" y="38"  text-anchor="middle" font-size="10">hero fit per map</text>
+      <text x="330" y="73"  text-anchor="middle">slot habit &alpha;</text>
+      <text x="330" y="86"  text-anchor="middle" font-size="10">current meta, B1&hellip;P2</text>
+      <text x="330" y="121" text-anchor="middle">time-share preference</text>
+      <text x="330" y="134" text-anchor="middle" font-size="10">minutes played = intent</text>
+      <text x="330" y="169" text-anchor="middle">threat</text>
+      <text x="330" y="182" text-anchor="middle" font-size="10">banned for winning, not playing</text>
+      <text x="330" y="217" text-anchor="middle">series adjustment</text>
+      <text x="330" y="230" text-anchor="middle" font-size="10">shown and lost fades</text>
+      <text x="330" y="265" text-anchor="middle">self-habit</text>
+      <text x="330" y="278" text-anchor="middle" font-size="10">signature bans and protects</text>
+      <text x="330" y="313" text-anchor="middle" style="fill:var(--blue)">soft denial D(h)</text>
+      <text x="330" y="326" text-anchor="middle" font-size="10" style="fill:var(--blue)">value their comps lose</text>
+      <text x="615" y="94"  text-anchor="middle">protect utility</text>
+      <text x="615" y="110" text-anchor="middle" font-size="10.5">&alpha; + pref + self + won-with + map</text>
+      <text x="615" y="242" text-anchor="middle">ban utility</text>
+      <text x="615" y="258" text-anchor="middle" font-size="10.5">&alpha; + threat + self + series + &kappa;D + map</text>
+      <text x="820" y="98"  text-anchor="middle">P(next protect)</text>
+      <text x="820" y="112" text-anchor="middle" font-size="10">softmax over legal</text>
+      <text x="820" y="246" text-anchor="middle">P(next ban)</text>
+      <text x="820" y="260" text-anchor="middle" font-size="10">softmax over legal</text>
+      <text x="828" y="168" font-size="10">Monte Carlo</text>
+      <text x="828" y="180" font-size="10">rolls the tree</text>
+      <text x="828" y="192" font-size="10">forward</text>
     </g>
   </svg>
-  <figcaption>The V4 model, everything learned from revealed play. Protects read what a team
-  spends minutes on and just won with; bans price the current meta, what the opponent wins with,
-  what the last map showed, and what their compositions would lose (blue box). Holdout-validated
-  on the last 45 series.</figcaption>
+  <figcaption>Everything is learned from revealed play; each utility uses the features named in
+  its formula. Protects read a team&rsquo;s own preferences; bans price the meta, the acting
+  team&rsquo;s signature bans, what the opponent wins with, the series so far, and what their
+  compositions would lose (blue box). Holdout-validated on the last 45 series.</figcaption>
 </figure>
 
 <h2>Log</h2>
@@ -378,7 +393,8 @@ function teamParams(key) {
   if (MODEL && key && MODEL.teams[key]) return MODEL.teams[key];
   if (!MODEL) return null;
   var gs = MODEL.g.reduce(function (a, b) { return a + b; }, 0);
-  return { cap: MODEL.g, thr: MODEL.g.map(function () { return 0; }),
+  var zeros = MODEL.g.map(function () { return 0; });
+  return { cap: MODEL.g, thr: zeros, sb: zeros, sp: zeros,
            ls: MODEL.g.map(function (x) { return x / gs; }), v: MODEL.default_v };
 }
 
@@ -413,6 +429,11 @@ function mapOffset(heroIdx) {
   return MODEL.map_offsets[mp][heroIdx];
 }
 
+function slotCoef(kind, slot) {
+  var c = MODEL.coef[kind];
+  return c[slot] || c["*"];
+}
+
 function predictAction(act, bansBy, protsBy) {
   if (!MODEL) return null;
   var side = act.side, kind = act.kind;
@@ -423,9 +444,10 @@ function predictAction(act, bansBy, protsBy) {
     legal = HEROES.filter(function (h) {
       return bansBy[side].indexOf(h) < 0 && protsBy[opp(side)].indexOf(h) < 0;
     });
-    var c = MODEL.coef.ban;
+    var c = slotCoef("ban", act.slot);
     var oppSide = opp(side);
     var tp = teamParams(teamKey(oppSide));
+    var me = teamParams(teamKey(side));
     var pool = HEROES.filter(function (h) { return bansBy[side].indexOf(h) < 0; });
     var key = side + "|" + bansBy[side].slice().sort().join(",") + "|" + (teamKey(oppSide) || "?");
     var D = denialValues(pool, tp.v, MODEL.tau, key);
@@ -436,6 +458,7 @@ function predictAction(act, bansBy, protsBy) {
       var rw = (ru && oppWon) ? 1 : 0;
       rows.push({ hero: h, parts: { alpha: alpha[i],
         thr: c.cap * tp.cap[i] + c.thr * tp.thr[i],
+        self: c.selfban * me.sb[i],
         rev: c.revu * ru + c.revw * rw,
         den: c.den * (D[h] || 0),
         map: c.map * mapOffset(i) } });
@@ -444,7 +467,7 @@ function predictAction(act, bansBy, protsBy) {
     legal = HEROES.filter(function (h) {
       return bansBy[opp(side)].indexOf(h) < 0 && protsBy[side].indexOf(h) < 0;
     });
-    var cp = MODEL.coef.protect;
+    var cp = slotCoef("protect", act.slot);
     var tpo = teamParams(teamKey(side));
     var meWon = ctx.winner === side;
     legal.forEach(function (h) {
@@ -452,6 +475,7 @@ function predictAction(act, bansBy, protsBy) {
       var ow = (meWon && ctx.used[side][h]) ? 1 : 0;
       rows.push({ hero: h, parts: { alpha: alpha[i],
         thr: cp.cap * tpo.cap[i] + cp.ls * tpo.ls[i],
+        self: cp.selfprot * tpo.sp[i],
         rev: cp.ownw * ow,
         den: 0,
         map: cp.map * mapOffset(i) } });
@@ -459,7 +483,7 @@ function predictAction(act, bansBy, protsBy) {
   }
   var mx = -Infinity;
   rows.forEach(function (r) {
-    r.u = r.parts.alpha + r.parts.thr + r.parts.rev + r.parts.den + r.parts.map;
+    r.u = r.parts.alpha + r.parts.thr + r.parts.self + r.parts.rev + r.parts.den + r.parts.map;
     if (r.u > mx) mx = r.u;
   });
   var Z = 0;
@@ -620,10 +644,10 @@ function recompute() {
       var hasMap = document.getElementById("mapSel").value !== "";
       var hasSeries = document.getElementById("prevBlue").value.trim() !== "" ||
         document.getElementById("prevRed").value.trim() !== "";
-      var ncol = 5 + (hasSeries ? 1 : 0) + (a.kind === "ban" ? 1 : 0) + (hasMap ? 1 : 0);
+      var ncol = 6 + (hasSeries ? 1 : 0) + (a.kind === "ban" ? 1 : 0) + (hasMap ? 1 : 0);
       html += '<div><table class="fc"><tr><th colspan="' + ncol + '"><span class="' + cls + '">' +
         teamName(a.side) + "</span> " + a.kind + " " + a.slot + " forecast</th></tr>" +
-        "<tr><th></th><th>hero</th><th>P</th><th>α</th><th>" + prefHdr + "</th>" +
+        "<tr><th></th><th>hero</th><th>P</th><th>α</th><th>" + prefHdr + "</th><th>self</th>" +
         (hasSeries ? "<th>series</th>" : "") +
         (a.kind === "ban" ? "<th>κD</th>" : "") + (hasMap ? "<th>map</th>" : "") + "</tr>";
       rows.slice(0, 8).forEach(function (r, k) {
@@ -633,6 +657,7 @@ function recompute() {
           '<td>' + (100 * r.p).toFixed(1) + '%&ensp;<span class="bar" style="width:' + w + 'px"></span></td>' +
           '<td class="num">' + r.parts.alpha.toFixed(2) + '</td>' +
           '<td class="num">' + r.parts.thr.toFixed(2) + '</td>' +
+          '<td class="num">' + r.parts.self.toFixed(2) + '</td>' +
           (hasSeries ? '<td class="num">' + r.parts.rev.toFixed(2) + '</td>' : "") +
           (a.kind === "ban" ? '<td class="num">' + r.parts.den.toFixed(2) + "</td>" : "") +
           (hasMap ? '<td class="num">' + r.parts.map.toFixed(2) + "</td>" : "") + "</tr>";
