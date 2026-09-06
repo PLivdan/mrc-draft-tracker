@@ -45,9 +45,6 @@
   .x { color: var(--red); font-weight: 600; }
   .p { color: var(--safe); font-weight: 600; }
   .bar { display: inline-block; height: 7px; background: var(--blue); vertical-align: baseline; }
-  .cols { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-          gap: 20px; align-items: start; }
-  @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
   .predwrap { display: flex; gap: 18px; flex-wrap: wrap; }
   .fcrow > td { background: var(--active); border-bottom: 1px solid var(--ink);
                 padding: 4px 6px 6px 6px; }
@@ -66,8 +63,6 @@
               padding: 3px 8px; margin: 8px 0; }
   main.whatif #cfBanner { display: block; }
   main.whatif #draftSection { background: var(--cf); }
-  .mcwrap { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
-  .mcwrap table { min-width: 140px; }
   .poolcols { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
   .poolcols table { min-width: 190px; }
   .treecols { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; }
@@ -97,7 +92,6 @@
 <div id="cfBanner">Counterfactual. Actual draft saved.
   <button id="backBtn">Back to actual</button></div>
 
-<div class="cols">
 <div id="draftSection">
 <h2>Draft</h2>
 <div id="trackHolder"></div>
@@ -107,13 +101,6 @@
 </table>
 </div>
 <p class="small" id="nowHint"></p>
-</div>
-
-<div>
-<h2>Roll forward</h2>
-<p><button id="mcBtn">Roll 800 drafts from here</button> <span class="small" id="mcMeta"></span></p>
-<div class="mcwrap" id="mcOut"></div>
-</div>
 </div>
 
 <h2>Pools</h2>
@@ -689,9 +676,6 @@ function recompute() {
     });
   }
 
-  document.getElementById("mcOut").innerHTML = "";
-  document.getElementById("mcMeta").textContent = "";
-
   // pools: one table per role, side by side
   var html2 = "";
   var counts = { blue: { avail: 0, safe: 0 }, red: { avail: 0, safe: 0 } };
@@ -808,71 +792,6 @@ function recompute() {
     try { localStorage.setItem("mrcDraftTracker2", JSON.stringify(snapshot())); } catch (e) {}
   }
 }
-
-// ---- Monte Carlo ----
-function rollForward(nSims) {
-  if (!MODEL || !lastState || lastState.currentPhase >= PHASES.length) return null;
-  var t0 = Date.now();
-  var countsBySlot = {};
-  ACTS.forEach(function (a) { countsBySlot[a.id] = {}; });
-  for (var s = 0; s < nSims; s++) {
-    var bans = { blue: lastState.bansBy.blue.slice(), red: lastState.bansBy.red.slice() };
-    var prots = { blue: lastState.protsBy.blue.slice(), red: lastState.protsBy.red.slice() };
-    for (var i = lastState.currentPhase; i < PHASES.length; i++) {
-      var ph = PHASES[i], chosen = {};
-      ph.acts.forEach(function (a) {
-        var rows = predictAction(a, bans, prots);
-        var u = Math.random(), acc = 0, pick = rows[rows.length - 1].hero;
-        for (var r = 0; r < rows.length; r++) {
-          acc += rows[r].p;
-          if (u <= acc) { pick = rows[r].hero; break; }
-        }
-        chosen[a.id] = { act: a, hero: pick };
-      });
-      ph.acts.forEach(function (a) {
-        var c = chosen[a.id];
-        (c.act.kind === "ban" ? bans : prots)[c.act.side].push(c.hero);
-        countsBySlot[a.id][c.hero] = (countsBySlot[a.id][c.hero] || 0) + 1;
-      });
-    }
-  }
-  return { counts: countsBySlot, ms: Date.now() - t0, n: nSims };
-}
-
-document.getElementById("mcBtn").addEventListener("click", function () {
-  if (!MODEL) return;
-  if (!lastState || lastState.currentPhase >= PHASES.length) {
-    document.getElementById("mcMeta").textContent = "Draft complete.";
-    return;
-  }
-  document.getElementById("mcMeta").textContent = "rolling";
-  setTimeout(function () {
-    var res = rollForward(800);
-    var out = "";
-    for (var i = lastState.currentPhase; i < PHASES.length; i++) {
-      PHASES[i].acts.forEach(function (a) {
-        var c = res.counts[a.id];
-        var rows = Object.keys(c).map(function (h) { return { hero: h, p: c[h] / res.n }; });
-        rows.sort(function (x, y) { return y.p - x.p || (x.hero < y.hero ? -1 : 1); });
-        var cls = a.side === "blue" ? "sideB" : "sideR";
-        out += '<table><tr><th colspan="2"><span class="' + cls + '">' + teamName(a.side) +
-          "</span> " + a.kind + " " + a.slot + "</th></tr>";
-        var shown = 0;
-        rows.slice(0, 5).forEach(function (r) {
-          shown += r.p;
-          out += "<tr><td>" + displayName(r.hero) + "</td><td>" +
-            (100 * r.p).toFixed(0) + "%</td></tr>";
-        });
-        out += '<tr><td class="num">other</td><td class="num">' +
-          Math.max(0, 100 * (1 - shown)).toFixed(0) + "%</td></tr></table>";
-      });
-    }
-    document.getElementById("mcOut").innerHTML = out;
-    document.getElementById("mcMeta").textContent = res.n + " draws from step " +
-      (lastState.currentPhase + 1) + ", " + (res.ms / 1000).toFixed(1) + " s" +
-      (whatIf ? ", counterfactual line" : "") + ".";
-  }, 20);
-});
 
 // ---- wiring ----
 document.querySelectorAll("input, select").forEach(function (el) {
