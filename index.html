@@ -108,19 +108,11 @@
 <p class="small"><span class="x">✕</span> banned &nbsp; <span class="p">P</span> protected, safe from bans</p>
 <div class="poolcols" id="pools"></div>
 
-<h2>Projected six</h2>
-<p class="small">The model&rsquo;s composition distribution for each team given the current pool:
-chance each hero ends up in their fielded six, and who plays it. Bans reshape this live;
-it is the other face of the denial term.</p>
-<div class="treecols">
-  <div id="projBlue"></div>
-  <div id="projRed"></div>
-</div>
-
 <h2>Player pools</h2>
 <p class="small">Heroes each player has played this season (latest lineup, share of playtime).
 Bans against the team strike heroes out as the draft advances.
-&#8592; marks each player&rsquo;s projected pick from the model&rsquo;s composition distribution.</p>
+Boxed hero = that player&rsquo;s projected pick; the number after the box is the model&rsquo;s
+confidence it ends up in the fielded six.</p>
 <div class="treecols">
   <div id="treeBlue"></div>
   <div id="treeRed"></div>
@@ -701,11 +693,9 @@ function recompute() {
     teamName("red") + " " + counts.red.avail + "/" + HEROES.length +
     (counts.red.safe ? ", " + counts.red.safe + " protected" : "") + ".";
 
-  // projected six per team
+  // projected picks per player (from the composition distribution)
   var projAssign = { blue: {}, red: {} };
-  ["blue", "red"].forEach(function (side) {
-    var holder = document.getElementById(side === "blue" ? "projBlue" : "projRed");
-    if (!MODEL) { holder.innerHTML = ""; return; }
+  if (MODEL) ["blue", "red"].forEach(function (side) {
     var tp = teamParams(teamKey(side));
     var oside = opp(side);
     var pool = HEROES.filter(function (h) { return bansBy[oside].indexOf(h) < 0; });
@@ -716,32 +706,19 @@ function recompute() {
     });
     rows.sort(function (a, b) { return b.p - a.p || (a.hero < b.hero ? -1 : 1); });
     var pools_ = MODEL.player_pools && teamKey(side) ? MODEL.player_pools[teamKey(side)] : null;
+    if (!pools_) return;
     var used = {};
-    var cls = side === "blue" ? "sideB" : "sideR";
-    var html = '<table><tr><th colspan="3"><span class="' + cls + '">' + teamName(side) +
-      "</span> projected six</th></tr><tr><th>hero</th><th>P(in six)</th><th>player</th></tr>";
-    rows.slice(0, 8).forEach(function (r) {
-      var who = "";
-      if (pools_) {
-        var best = null, bs = 0;
-        pools_.forEach(function (pl) {
-          if (used[pl.name]) return;
-          pl.heroes.forEach(function (e) {
-            if (e[0] === r.hero && e[1] > bs) { bs = e[1]; best = pl.name; }
-          });
+    rows.forEach(function (r) {
+      if (Object.keys(projAssign[side]).length >= 6) return;
+      var best = null, bs = 0;
+      pools_.forEach(function (pl) {
+        if (used[pl.name]) return;
+        pl.heroes.forEach(function (e) {
+          if (e[0] === r.hero && e[1] > bs) { bs = e[1]; best = pl.name; }
         });
-        if (best) { who = best; }
-      }
-      var prot = protsBy[side].indexOf(r.hero) >= 0;
-      html += "<tr><td>" + displayName(r.hero) + (prot ? ' <span class="p">P</span>' : "") +
-        '</td><td>' + (100 * r.p).toFixed(0) + '%&ensp;<span class="bar" style="width:' +
-        Math.max(1, Math.round(r.p * 70)) + 'px"></span></td><td class="num">' + who + "</td></tr>";
-      if (who) {
-        used[who] = true;
-        if (Object.keys(projAssign[side]).length < 6) projAssign[side][who] = r.hero;
-      }
+      });
+      if (best) { used[best] = true; projAssign[side][best] = { hero: r.hero, p: r.p }; }
     });
-    holder.innerHTML = html + "</table>";
   });
 
   // player pool trees
@@ -790,14 +767,27 @@ function recompute() {
             'opacity="0.75">✕ ' + label + "</text>";
           s += '<line x1="' + (hx + 12) + '" y1="' + hy + '" x2="' + (hx + 12 + label.length * 4.6) +
             '" y2="' + hy + '" style="stroke:var(--red)" stroke-width="0.8"/>';
-        } else if (prot) {
-          s += '<text x="' + hx + '" y="' + (hy + 3.5) + '" font-size="11" style="fill:var(--safe)" ' +
-            'font-weight="600">P ' + label + (projAssign[side][pl.name] === e[0] ?
-            ' <tspan style="fill:' + col + '" font-weight="600">&#8592; likely</tspan>' : "") + "</text>";
         } else {
-          s += '<text x="' + hx + '" y="' + (hy + 3.5) + '" font-size="11" ' +
-            'fill="currentColor">' + label + (projAssign[side][pl.name] === e[0] ?
-            ' <tspan style="fill:' + col + '" font-weight="600">&#8592; likely</tspan>' : "") + "</text>";
+          var pa = projAssign[side][pl.name];
+          var isProj = pa && pa.hero === e[0];
+          var pad = prot ? 16 : 8;
+          if (isProj) {
+            s += '<rect x="' + (hx - 4) + '" y="' + (hy - 9) + '" width="' +
+              (label.length * 5.2 + pad) + '" height="14" fill="none" style="stroke:' +
+              col + '" stroke-width="1.1"/>';
+          }
+          if (prot) {
+            s += '<text x="' + hx + '" y="' + (hy + 3.5) + '" font-size="11" style="fill:var(--safe)" ' +
+              'font-weight="600">P ' + label + "</text>";
+          } else {
+            s += '<text x="' + hx + '" y="' + (hy + 3.5) + '" font-size="11" ' +
+              'fill="currentColor">' + label + "</text>";
+          }
+          if (isProj) {
+            s += '<text x="' + (hx + label.length * 5.2 + pad + 2) + '" y="' + (hy + 3.5) +
+              '" font-size="10.5" font-weight="600" style="fill:' + col + '">' +
+              Math.round(100 * pa.p) + "%</text>";
+          }
         }
       });
       y = y1 + rowH + 6;
