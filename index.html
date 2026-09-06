@@ -131,71 +131,83 @@ Bans against the team strike heroes out as the draft advances.</p>
 
 <h2>Model</h2>
 <figure>
-  <svg viewBox="0 0 860 330" role="img"
-       aria-label="Pipeline: revealed usage yields a hero space, team capabilities and slot baselines; protects are modeled from the acting team's own preferences; bans add a denial term measuring how much value the opponent's plausible role-legal compositions lose when a hero is removed; both feed softmaxes over the legal picks, which a Monte Carlo simulator rolls forward.">
+  <svg viewBox="0 0 880 340" role="img"
+       aria-label="V4 pipeline: recency-weighted usage, match results, series context, map and the opponent's role-legal pool produce five features (slot habit, time-share preference, threat, series adjustment, soft denial); protects combine habit, preference, won-with and map; bans combine habit, threat, series, denial and map; each feeds a softmax over the legal picks and a Monte Carlo roll-forward.">
     <defs>
       <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
       </marker>
     </defs>
     <g fill="none" stroke="currentColor" stroke-width="1.1">
-      <rect x="14"  y="130" width="140" height="52"/>
-      <rect x="220" y="22"  width="150" height="40"/>
-      <rect x="220" y="86"  width="150" height="40"/>
-      <rect x="220" y="150" width="150" height="40"/>
-      <rect x="220" y="236" width="150" height="56"/>
-      <rect x="440" y="34"  width="180" height="52"/>
-      <rect x="440" y="236" width="180" height="56" style="stroke:var(--blue)" stroke-width="1.8"/>
-      <rect x="440" y="150" width="180" height="52"/>
-      <rect x="692" y="92"  width="150" height="44"/>
-      <rect x="692" y="196" width="150" height="44"/>
+      <rect x="10"  y="30"  width="150" height="44"/>
+      <rect x="10"  y="104" width="150" height="44"/>
+      <rect x="10"  y="178" width="150" height="44"/>
+      <rect x="10"  y="252" width="150" height="44"/>
+      <rect x="230" y="10"  width="160" height="38"/>
+      <rect x="230" y="66"  width="160" height="38"/>
+      <rect x="230" y="122" width="160" height="38"/>
+      <rect x="230" y="178" width="160" height="38"/>
+      <rect x="230" y="252" width="160" height="44" style="stroke:var(--blue)" stroke-width="1.8"/>
+      <rect x="470" y="52"  width="180" height="56"/>
+      <rect x="470" y="200" width="180" height="56"/>
+      <rect x="720" y="60"  width="150" height="40"/>
+      <rect x="720" y="208" width="150" height="40"/>
     </g>
     <g stroke="currentColor" stroke-width="1.1" marker-end="url(#arr)" fill="none">
-      <path d="M154,142 C190,120 195,50 218,44"/>
-      <path d="M154,152 C186,140 194,112 218,106"/>
-      <path d="M154,162 C186,164 196,168 218,170"/>
-      <path d="M154,172 C190,196 195,252 218,260"/>
-      <line x1="370" y1="42"  x2="438" y2="52"/>
-      <line x1="370" y1="106" x2="438" y2="66"/>
-      <line x1="370" y1="170" x2="438" y2="80"/>
-      <line x1="370" y1="106" x2="438" y2="168"/>
-      <line x1="370" y1="170" x2="438" y2="184"/>
-      <line x1="370" y1="264" x2="438" y2="264"/>
-      <line x1="530" y1="236" x2="530" y2="204"/>
-      <line x1="620" y1="60"  x2="690" y2="108"/>
-      <line x1="620" y1="176" x2="690" y2="212"/>
-      <line x1="767" y1="136" x2="767" y2="194"/>
+      <line x1="160" y1="42"  x2="228" y2="26"/>
+      <line x1="160" y1="52"  x2="228" y2="82"/>
+      <line x1="160" y1="126" x2="228" y2="136"/>
+      <line x1="160" y1="60"  x2="228" y2="130"/>
+      <line x1="160" y1="200" x2="228" y2="196"/>
+      <line x1="160" y1="274" x2="228" y2="274"/>
+      <line x1="390" y1="29"  x2="468" y2="66"/>
+      <line x1="390" y1="85"  x2="468" y2="80"/>
+      <line x1="390" y1="196" x2="468" y2="94"/>
+      <line x1="390" y1="29"  x2="468" y2="214"/>
+      <line x1="390" y1="141" x2="468" y2="228"/>
+      <line x1="390" y1="196" x2="468" y2="240"/>
+      <line x1="390" y1="274" x2="468" y2="252"/>
+      <line x1="650" y1="80"  x2="718" y2="80"/>
+      <line x1="650" y1="228" x2="718" y2="228"/>
+      <line x1="795" y1="100" x2="795" y2="206"/>
     </g>
     <g font-size="12" fill="currentColor" font-family="inherit">
-      <text x="84"  y="150" text-anchor="middle">Revealed usage</text>
-      <text x="84"  y="166" text-anchor="middle">868 maps, Ignite 2026</text>
-      <text x="295" y="39"  text-anchor="middle">hero space e</text>
-      <text x="295" y="53"  text-anchor="middle" font-size="10.5">who plays it also plays&hellip;</text>
-      <text x="295" y="103" text-anchor="middle">team capability C</text>
-      <text x="295" y="117" text-anchor="middle" font-size="10.5">recency-decayed, shrunk</text>
-      <text x="295" y="167" text-anchor="middle">slot baseline &alpha;</text>
-      <text x="295" y="181" text-anchor="middle" font-size="10.5">B1&hellip;B4, P1, P2 habits</text>
-      <text x="295" y="257" text-anchor="middle">opponent pool</text>
-      <text x="295" y="271" text-anchor="middle" font-size="10.5">role-legal 2-2-2 comps</text>
-      <text x="295" y="284" text-anchor="middle" font-size="10.5">(&plusmn;1 vanguard/duelist)</text>
-      <text x="530" y="55"  text-anchor="middle">protect utility</text>
-      <text x="530" y="70"  text-anchor="middle" font-size="11">&alpha; + &beta;<tspan baseline-shift="sub" font-size="8">P</tspan>&middot;C(own) + &eta;&middot;e</text>
-      <text x="530" y="171" text-anchor="middle">ban utility</text>
-      <text x="530" y="186" text-anchor="middle" font-size="11">&alpha; + &beta;&middot;C(opp) + &kappa;&middot;D</text>
-      <text x="530" y="257" text-anchor="middle" style="fill:var(--blue)">soft denial D(h)</text>
-      <text x="530" y="272" text-anchor="middle" font-size="11" style="fill:var(--blue)">value their comps lose</text>
-      <text x="530" y="285" text-anchor="middle" font-size="11" style="fill:var(--blue)">if h is removed</text>
-      <text x="767" y="110" text-anchor="middle">P(next protect)</text>
-      <text x="767" y="124" text-anchor="middle" font-size="10.5">softmax over legal</text>
-      <text x="767" y="214" text-anchor="middle">P(next ban)</text>
-      <text x="767" y="228" text-anchor="middle" font-size="10.5">softmax over legal</text>
-      <text x="536" y="224" font-size="10.5">weights &kappa; per ban slot</text>
-      <text x="772" y="170" font-size="10.5">Monte Carlo:</text>
-      <text x="772" y="182" font-size="10.5">roll the tree forward</text>
+      <text x="85"  y="47"  text-anchor="middle">Revealed usage</text>
+      <text x="85"  y="61"  text-anchor="middle" font-size="10.5">868 maps, 5-day memory</text>
+      <text x="85"  y="121" text-anchor="middle">Match results</text>
+      <text x="85"  y="135" text-anchor="middle" font-size="10.5">who wins with what</text>
+      <text x="85"  y="195" text-anchor="middle">Series context</text>
+      <text x="85"  y="209" text-anchor="middle" font-size="10.5">previous map, winner</text>
+      <text x="85"  y="269" text-anchor="middle">Opponent pool</text>
+      <text x="85"  y="283" text-anchor="middle" font-size="10.5">role-legal comps, 2-1-3 ok</text>
+      <text x="310" y="27"  text-anchor="middle">slot habit &alpha;</text>
+      <text x="310" y="40"  text-anchor="middle" font-size="10.5">current meta, B1&hellip;P2</text>
+      <text x="310" y="83"  text-anchor="middle">time-share preference</text>
+      <text x="310" y="96"  text-anchor="middle" font-size="10.5">minutes played = intent</text>
+      <text x="310" y="139" text-anchor="middle">threat</text>
+      <text x="310" y="152" text-anchor="middle" font-size="10.5">banned for winning, not playing</text>
+      <text x="310" y="195" text-anchor="middle">series adjustment</text>
+      <text x="310" y="208" text-anchor="middle" font-size="10.5">lost with it: less scary</text>
+      <text x="310" y="271" text-anchor="middle" style="fill:var(--blue)">soft denial D(h)</text>
+      <text x="310" y="285" text-anchor="middle" font-size="10.5" style="fill:var(--blue)">value their comps lose</text>
+      <text x="560" y="73"  text-anchor="middle">protect utility</text>
+      <text x="560" y="88"  text-anchor="middle" font-size="10.5">&alpha; + pref + won-with + map</text>
+      <text x="560" y="221" text-anchor="middle">ban utility</text>
+      <text x="560" y="236" text-anchor="middle" font-size="10.5">&alpha; + threat + series + &kappa;D + map</text>
+      <text x="795" y="78"  text-anchor="middle">P(next protect)</text>
+      <text x="795" y="92"  text-anchor="middle" font-size="10.5">softmax over legal</text>
+      <text x="795" y="226" text-anchor="middle">P(next ban)</text>
+      <text x="795" y="240" text-anchor="middle" font-size="10.5">softmax over legal</text>
+      <text x="800" y="146" font-size="10.5">Monte Carlo:</text>
+      <text x="800" y="158" font-size="10.5">roll the tree</text>
+      <text x="800" y="170" font-size="10.5">forward</text>
+      <text x="420" y="320" font-size="10.5">map offsets shift both utilities when a map is set</text>
     </g>
   </svg>
-  <figcaption>Learned from revealed play only. Protects read the team's own preference; bans price
-  what the opponent's plausible compositions lose when a hero is removed (blue box).</figcaption>
+  <figcaption>The V4 model, everything learned from revealed play. Protects read what a team
+  spends minutes on and just won with; bans price the current meta, what the opponent wins with,
+  what the last map showed, and what their compositions would lose (blue box). Holdout-validated
+  on the last 45 series.</figcaption>
 </figure>
 
 <h2>Log</h2>
