@@ -618,8 +618,7 @@ function recompute() {
       var cls = a.side === "blue" ? "sideB" : "sideR";
       var prefHdr = a.kind === "ban" ? "threat" : "pref";
       var hasMap = document.getElementById("mapSel").value !== "";
-      var hasSeries = document.getElementById("prevWin").value !== "" ||
-        document.getElementById("prevBlue").value.trim() !== "" ||
+      var hasSeries = document.getElementById("prevBlue").value.trim() !== "" ||
         document.getElementById("prevRed").value.trim() !== "";
       var ncol = 5 + (hasSeries ? 1 : 0) + (a.kind === "ban" ? 1 : 0) + (hasMap ? 1 : 0);
       html += '<div><table class="fc"><tr><th colspan="' + ncol + '"><span class="' + cls + '">' +
@@ -638,6 +637,14 @@ function recompute() {
           (a.kind === "ban" ? '<td class="num">' + r.parts.den.toFixed(2) + "</td>" : "") +
           (hasMap ? '<td class="num">' + r.parts.map.toFixed(2) + "</td>" : "") + "</tr>";
       });
+      var adj = rows.filter(function (r) { return Math.abs(r.parts.rev) > 1e-9; })
+        .sort(function (a, b) { return a.parts.rev - b.parts.rev; })
+        .map(function (r) { return displayName(r.hero) + " " +
+          (r.parts.rev > 0 ? "+" : "") + r.parts.rev.toFixed(2); });
+      if (hasSeries && adj.length) {
+        html += '<tr><td colspan="' + ncol + '" class="small">series adjustments: ' +
+          adj.join(", ") + "</td></tr>";
+      }
       html += "</table></div>";
     });
     html += '</div><div class="small">Click a hero to play that line. τ = ' + MODEL.tau +
