@@ -747,11 +747,23 @@ document.getElementById("mcBtn").addEventListener("click", function () {
 document.querySelectorAll("input, select").forEach(function (el) {
   el.addEventListener("input", recompute);
 });
+var resetArmed = null;
 document.getElementById("resetBtn").addEventListener("click", function () {
-  if (!confirm("Clear the whole draft?")) return;
-  ACTS.forEach(function (a) { document.getElementById(a.id).value = ""; });
-  if (whatIf) { whatIf = false; actualSnapshot = null; document.getElementById("mainEl").className = ""; }
-  recompute();
+  var btn = document.getElementById("resetBtn");
+  if (resetArmed) {
+    clearTimeout(resetArmed);
+    resetArmed = null;
+    btn.textContent = "Reset";
+    ACTS.forEach(function (a) { document.getElementById(a.id).value = ""; });
+    if (whatIf) { whatIf = false; actualSnapshot = null; document.getElementById("mainEl").className = ""; }
+    recompute();
+    return;
+  }
+  btn.textContent = "Confirm reset";
+  resetArmed = setTimeout(function () {
+    resetArmed = null;
+    btn.textContent = "Reset";
+  }, 4000);
 });
 document.getElementById("backBtn").addEventListener("click", exitWhatIf);
 function effectiveTheme() {
@@ -777,7 +789,12 @@ try {
 document.getElementById("copyBtn").addEventListener("click", function () {
   var t = document.getElementById("log");
   t.select();
-  try { document.execCommand("copy"); } catch (e) {}
+  var done = false;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t.value).then(function () {}, function () {});
+    done = true;
+  }
+  if (!done) { try { document.execCommand("copy"); } catch (e) {} }
 });
 
 try {
