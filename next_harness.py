@@ -13,7 +13,7 @@ MAJOR_BREAKS = [_pt(5,13), _pt(7,2), _pt(7,11), _pt(8,6), _pt(8,19)]
 ALL_BREAKS = MAJOR_BREAKS + [_pt(5,20), _pt(5,27), _pt(6,3), _pt(6,10), _pt(6,18),
                              _pt(6,24), _pt(7,15), _pt(7,22), _pt(7,29), _pt(8,4), _pt(8,12)]
 MODE = sys.argv[1] if len(sys.argv) > 1 else "main"
-if MODE == "patch":
+if MODE in ("patch", "combo"):
     PHI = float(sys.argv[2]); BREAKS = MAJOR_BREAKS if sys.argv[3] == "major" else ALL_BREAKS
 else:
     PHI = 1.0; BREAKS = []
@@ -469,6 +469,9 @@ if MODE == "main":
     BAN_F = ["cap", "thr", "revu", "revw", "map", "selfban_r"]
     PROT_F = ["cap", "ls", "ownw", "map", "selfprot_r", "haz"]
     run(False, "ROSTER-HABIT")
+elif MODE == "combo":
+    BAN_F = ["cap", "thr", "revu", "revw", "map", "selfban", "bb"]
+    run(False, f"COMBO patch{PHI}+banback")
 else:
     run(False, f"PATCH phi={PHI} {sys.argv[3]}")
 print("NEXT_DONE", flush=True)
