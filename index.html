@@ -226,6 +226,8 @@ HEROES.forEach(function (s) {
 });
 
 // ---- numeric core (mirrors the Python model) ----
+var ROLE_ORDER = ["Vanguard", "Duelist", "Strategist"];
+
 function teamParams(key) {
   if (MODEL && key && MODEL.teams[key]) return MODEL.teams[key];
   if (!MODEL) return null;
