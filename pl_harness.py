@@ -364,6 +364,7 @@ KALPHA_FULL = np.log((kind_c_final + 0.25) / ktot)   # end-state PL habit (looka
 def run(pl, label):
     res = {"all": {"ban": [0.0,0,0,0], "protect": [0.0,0,0,0]},
            "surprise": {"ban": [0.0,0,0,0], "protect": [0.0,0,0,0]}}
+    t_run = time.time()
     for bi, blk_ in enumerate(BLOCKS):
         blk = set(blk_)
         cutoff = min(d["t"] for d in decisions if d["series"] in blk)
@@ -389,7 +390,8 @@ def run(pl, label):
                 a = res[scope][d["kind"]]
                 a[0] -= math.log(max(p[d["y"]], 1e-12)); a[1] += 1
                 a[2] += (rank == 1); a[3] += (rank <= 3)
-        print(f"   [{label}] block {bi+1}/{len(BLOCKS)}", flush=True)
+        eta = (time.time() - t_run) / (bi + 1) * (len(BLOCKS) - bi - 1)
+        print(f"   [{label}] block {bi+1}/{len(BLOCKS)} ETA {eta:.0f}s", flush=True)
     for scope in ("all", "surprise"):
         line = (label + " " + scope).ljust(26)
         for kind in ("ban", "protect"):
