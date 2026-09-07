@@ -32,6 +32,7 @@ def collect(dp, dt, dg):
     """One chronological pass; returns per-(map,side) team observations with
     as-of ingredient snapshots. dp/dt/dg: per-appearance decay for player/team/league."""
     p_time = defaultdict(lambda: np.zeros(NH))
+    p_avail = defaultdict(lambda: np.zeros(NH))
     t_time = defaultdict(lambda: np.zeros(NH))
     g_time = np.zeros(NH)
     map_u = defaultdict(lambda: np.zeros(NH)); map_n = defaultdict(float)
@@ -74,6 +75,7 @@ def collect(dp, dt, dg):
                 if a_vec.sum() <= 0: continue
                 players.append({"pid": pid, "a": a_vec,
                                 "p_vec": p_time[pid].copy(), "p_sum": float(p_time[pid].sum()),
+                                "p_avl": p_avail[pid].copy(),
                                 "last": None})
             if players:
                 obs.append({"map": r["map_uid"], "side": side, "team": team, "phase": phase,
@@ -87,6 +89,7 @@ def collect(dp, dt, dg):
             map_u[mp] *= 0.995; map_n[mp] *= 0.995
         for side in ("blue", "red"):
             team = tn[side]
+            opp2 = "red" if side == "blue" else "blue"
             t_time[team] *= dt
             for p in r["lineups"][side]:
                 pid = p["player_id"]
@@ -97,6 +100,10 @@ def collect(dp, dt, dg):
                 for h, s in shares.items():
                     if h in HIDX: vec[HIDX[h]] = s / tot
                 p_time[pid] = dp * p_time[pid] + vec
+                availv = np.ones(NH)
+                for h in bans_by[opp2]:
+                    if h in HIDX: availv[HIDX[h]] = 0.0
+                p_avail[pid] = dp * p_avail[pid] + availv
                 t_time[team] += vec
                 g_time += vec
                 if mp:
@@ -106,11 +113,15 @@ def collect(dp, dt, dg):
 
 BP = 0.0   # own-protect boost (log-scale)
 LM = 0.0   # map-offset loading
+EXPO_P = False   # exposure-adjusted player history (share given hero availability)
 
 def q_for(pl, ob, kp, kt):
     g = ob["g"]
     s_team = (ob["t_vec"] + kt * g) / (ob["t_sum"] + kt)
-    q = (pl["p_vec"] + kp * s_team) / (pl["p_sum"] + kp)
+    if EXPO_P:
+        q = (pl["p_vec"] + kp * s_team) / (pl["p_avl"] + kp)
+    else:
+        q = (pl["p_vec"] + kp * s_team) / (pl["p_sum"] + kp)
     if BP or LM:
         q = q * np.exp(BP * ob["prot"] + LM * ob["moff"])
     q = np.where(ob["banned"], 0.0, q)
@@ -159,15 +170,18 @@ def score(obs, phase, kp, kt):
 
 t0 = time.time()
 results = {}
-for dp in (0.88, 0.95, 0.99):
+for dp in (0.88, 0.95):
     obs = collect(dp, 0.88, 0.995)
-    for kp in (2.0, 5.0, 10.0, 20.0):
-        for kt in (5.0, 20.0, 50.0):
-            r = score(obs, "inner", kp, kt)
-            results[(dp, kp, kt)] = (r, obs)
-            print(f"inner dp={dp} kp={kp} kt={kt} | top1 {r['top1']*100:.1f}% top2 {r['top2']*100:.1f}% ce {r['ce']:.4f} box {r['boxacc']*100:.1f}%/{r['boxtop2']*100:.1f}% cov2 {r['cov2']*100:.1f}% n={r['n']}", flush=True)
+    for ep in (0, 1):
+        globals()["EXPO_P"] = bool(ep)
+        for kp in (2.0, 5.0, 10.0):
+            for kt in (5.0, 20.0, 50.0):
+                r = score(obs, "inner", kp, kt)
+                results[(dp, ep, kp, kt)] = (r, obs)
+                print(f"inner dp={dp} ep={ep} kp={kp} kt={kt} | top1 {r['top1']*100:.1f}% top2 {r['top2']*100:.1f}% ce {r['ce']:.4f} box {r['boxacc']*100:.1f}%/{r['boxtop2']*100:.1f}% cov2 {r['cov2']*100:.1f}% n={r['n']}", flush=True)
 best_key = min(results, key=lambda k: results[k][0]["ce"])
-print(f"\nBEST on inner: dp={best_key[0]} kp={best_key[1]} kt={best_key[2]}  [{time.time()-t0:.0f}s]", flush=True)
+globals()["EXPO_P"] = bool(best_key[1])
+print(f"\nBEST on inner: dp={best_key[0]} ep={best_key[1]} kp={best_key[2]} kt={best_key[3]}  [{time.time()-t0:.0f}s]", flush=True)
 
 # conditioning grid (protect boost x map loading) on INNER, base config fixed
 r_obs = results[best_key][1]
@@ -176,16 +190,16 @@ for bp in (0.0, 1.0, 2.0, 3.0):
     for lm in (0.0, 0.5, 1.0):
         if bp == 0.0 and lm == 0.0: continue
         globals()["BP"], globals()["LM"] = bp, lm
-        rc = score(r_obs, "inner", best_key[1], best_key[2])
+        rc = score(r_obs, "inner", best_key[2], best_key[3])
         print(f"inner cond bp={bp} lm={lm} | top1 {rc['top1']*100:.1f}% ce {rc['ce']:.4f} box {rc['boxacc']*100:.1f}%/{rc['boxtop2']*100:.1f}% cov2 {rc['cov2']*100:.1f}%", flush=True)
         if rc["ce"] < bestc[1]: bestc = ((bp, lm), rc["ce"])
 globals()["BP"], globals()["LM"] = bestc[0]
 print(f"BEST conditioning: bp={bestc[0][0]} lm={bestc[0][1]}", flush=True)
-condf = score(r_obs, "hold", best_key[1], best_key[2])
+condf = score(r_obs, "hold", best_key[2], best_key[3])
 print(f"HOLDOUT q+conditioning | top1 {condf['top1']*100:.1f}% top2 {condf['top2']*100:.1f}% ce {condf['ce']:.4f} box {condf['boxacc']*100:.1f}%/{condf['boxtop2']*100:.1f}% cov2 {condf['cov2']*100:.1f}% n={condf['n']}", flush=True)
 globals()["BP"], globals()["LM"] = 0.0, 0.0
 
-final = score(r_obs, "hold", best_key[1], best_key[2])
+final = score(r_obs, "hold", best_key[2], best_key[3])
 print(f"HOLDOUT q-model      | top1 {final['top1']*100:.1f}% top2 {final['top2']*100:.1f}% ce {final['ce']:.4f} box {final['boxacc']*100:.1f}%/{final['boxtop2']*100:.1f}% cov2 {final['cov2']*100:.1f}% n={final['n']}", flush=True)
 naive = score(r_obs, "hold", 1e-6, 1e9)   # kp~0: raw player career share (league fill-in for empty)
 prior = score(r_obs, "hold", 1e9, 1e-6)   # kp huge: pure team-rate prior
@@ -193,14 +207,22 @@ print(f"HOLDOUT raw-career   | top1 {naive['top1']*100:.1f}% top2 {naive['top2']
 print(f"HOLDOUT team-prior   | top1 {prior['top1']*100:.1f}% top2 {prior['top2']*100:.1f}% ce {prior['ce']:.4f} box {prior['boxacc']*100:.1f}%/{prior['boxtop2']*100:.1f}% cov2 {prior['cov2']*100:.1f}%", flush=True)
 
 # ---- export as-of-END shrunk q per player (latest lineup per team) ----
-dp_b, kp_b, kt_b = best_key
+dp_b, ep_b, kp_b, kt_b = best_key
 p_time = defaultdict(lambda: np.zeros(NH)); t_time = defaultdict(lambda: np.zeros(NH))
+p_avail2 = defaultdict(lambda: np.zeros(NH))
 g_time = np.zeros(NH); latest = {}
 for r in recs:
     tn = {s: r["teams"][s]["name"] for s in ("blue", "red")}
+    bans_by2 = {"blue": [], "red": []}
+    for a2 in r["actions"]:
+        if a2["kind"] == "ban": bans_by2[a2["side"]].append(a2["hero"])
     g_time *= 0.995
     for side in ("blue", "red"):
         team = tn[side]; t_time[team] *= 0.88
+        opp2 = "red" if side == "blue" else "blue"
+        availv = np.ones(NH)
+        for h in bans_by2[opp2]:
+            if h in HIDX: availv[HIDX[h]] = 0.0
         names = []
         for p in r["lineups"][side]:
             pid = p["player_id"]
@@ -210,6 +232,7 @@ for r in recs:
             for h, s in shares.items():
                 if h in HIDX: vec[HIDX[h]] = s / tot
             p_time[pid] = dp_b * p_time[pid] + vec
+            p_avail2[pid] = dp_b * p_avail2[pid] + availv
             t_time[team] += vec; g_time += vec
             names.append((pid, p["name"]))
         if names: latest[team] = names
@@ -219,7 +242,8 @@ for team, names in latest.items():
     s_team = (t_time[team] + kt_b * g_norm) / (t_time[team].sum() + kt_b)
     rows = []
     for pid, nm in names:
-        q = (p_time[pid] + kp_b * s_team) / (p_time[pid].sum() + kp_b)
+        den_p = (p_avail2[pid] if ep_b else np.full(NH, p_time[pid].sum())) + kp_b
+        q = (p_time[pid] + kp_b * s_team) / den_p
         idx = np.argsort(-q)[:8]
         rows.append({"name": nm,
                      "q": [[HEROES[int(i)], round(float(q[i]), 4)] for i in idx if q[i] > 0.005]})
