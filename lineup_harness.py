@@ -34,12 +34,22 @@ def collect(dp, dt, dg):
     p_time = defaultdict(lambda: np.zeros(NH))
     t_time = defaultdict(lambda: np.zeros(NH))
     g_time = np.zeros(NH)
+    map_u = defaultdict(lambda: np.zeros(NH)); map_n = defaultdict(float)
     obs = []
     for r in recs:
         tn = {s: r["teams"][s]["name"] for s in ("blue", "red")}
-        bans_by = {"blue": [], "red": []}
+        bans_by = {"blue": [], "red": []}; prots_by = {"blue": [], "red": []}
         for a in r["actions"]:
             if a["kind"] == "ban": bans_by[a["side"]].append(a["hero"])
+            else: prots_by[a["side"]].append(a["hero"])
+        mp = r.get("map_name")
+        gs2 = g_time.sum()
+        if mp and map_n.get(mp, 0) >= 3 and gs2 > 0:
+            gref = (g_time + 0.1) / (gs2 + 0.1 * NH)
+            gm = (map_u[mp] + 15.0 * gref * 6.0) / (map_n[mp] * 6.0 + 15.0 * 6.0)
+            moff = np.clip(np.log(np.maximum(gm / np.maximum(gref, 1e-9), 1e-6)), -1.2, 1.2)
+        else:
+            moff = np.zeros(NH)
         phase = "hold" if r["map_uid"] in HOLDSET else ("inner" if r["map_uid"] in INNER else "train")
         gs = g_time.sum()
         g_norm = (g_time + 0.1) / (gs + 0.1 * NH)
@@ -48,6 +58,9 @@ def collect(dp, dt, dg):
             banned = np.zeros(NH, bool)
             for h in bans_by[opp]:
                 if h in HIDX: banned[HIDX[h]] = True
+            protv = np.zeros(NH)
+            for h in prots_by[side]:
+                if h in HIDX: protv[HIDX[h]] = 1.0
             team = tn[side]
             players = []
             for p in r["lineups"][side]:
@@ -65,10 +78,13 @@ def collect(dp, dt, dg):
             if players:
                 obs.append({"map": r["map_uid"], "side": side, "team": team, "phase": phase,
                             "mapname": r.get("map_name"), "banned": banned,
+                            "prot": protv, "moff": moff,
                             "t_vec": t_time[team].copy(), "t_sum": float(t_time[team].sum()),
                             "g": g_norm, "players": players})
         # post-map update
         g_time *= dg
+        if mp:
+            map_u[mp] *= 0.995; map_n[mp] *= 0.995
         for side in ("blue", "red"):
             team = tn[side]
             t_time[team] *= dt
@@ -83,12 +99,20 @@ def collect(dp, dt, dg):
                 p_time[pid] = dp * p_time[pid] + vec
                 t_time[team] += vec
                 g_time += vec
+                if mp:
+                    map_u[mp] += vec
+        if mp: map_n[mp] += 1
     return obs
+
+BP = 0.0   # own-protect boost (log-scale)
+LM = 0.0   # map-offset loading
 
 def q_for(pl, ob, kp, kt):
     g = ob["g"]
     s_team = (ob["t_vec"] + kt * g) / (ob["t_sum"] + kt)
     q = (pl["p_vec"] + kp * s_team) / (pl["p_sum"] + kp)
+    if BP or LM:
+        q = q * np.exp(BP * ob["prot"] + LM * ob["moff"])
     q = np.where(ob["banned"], 0.0, q)
     s = q.sum()
     return q / s if s > 0 else np.full(NH, 1.0 / NH)
@@ -145,8 +169,22 @@ for dp in (0.88, 0.95, 0.99):
 best_key = min(results, key=lambda k: results[k][0]["ce"])
 print(f"\nBEST on inner: dp={best_key[0]} kp={best_key[1]} kt={best_key[2]}  [{time.time()-t0:.0f}s]", flush=True)
 
-# baselines on holdout + chosen model, scored ONCE
+# conditioning grid (protect boost x map loading) on INNER, base config fixed
 r_obs = results[best_key][1]
+bestc = ((0.0, 0.0), results[best_key][0]["ce"])
+for bp in (0.0, 1.0, 2.0, 3.0):
+    for lm in (0.0, 0.5, 1.0):
+        if bp == 0.0 and lm == 0.0: continue
+        globals()["BP"], globals()["LM"] = bp, lm
+        rc = score(r_obs, "inner", best_key[1], best_key[2])
+        print(f"inner cond bp={bp} lm={lm} | top1 {rc['top1']*100:.1f}% ce {rc['ce']:.4f} box {rc['boxacc']*100:.1f}%/{rc['boxtop2']*100:.1f}% cov2 {rc['cov2']*100:.1f}%", flush=True)
+        if rc["ce"] < bestc[1]: bestc = ((bp, lm), rc["ce"])
+globals()["BP"], globals()["LM"] = bestc[0]
+print(f"BEST conditioning: bp={bestc[0][0]} lm={bestc[0][1]}", flush=True)
+condf = score(r_obs, "hold", best_key[1], best_key[2])
+print(f"HOLDOUT q+conditioning | top1 {condf['top1']*100:.1f}% top2 {condf['top2']*100:.1f}% ce {condf['ce']:.4f} box {condf['boxacc']*100:.1f}%/{condf['boxtop2']*100:.1f}% cov2 {condf['cov2']*100:.1f}% n={condf['n']}", flush=True)
+globals()["BP"], globals()["LM"] = 0.0, 0.0
+
 final = score(r_obs, "hold", best_key[1], best_key[2])
 print(f"HOLDOUT q-model      | top1 {final['top1']*100:.1f}% top2 {final['top2']*100:.1f}% ce {final['ce']:.4f} box {final['boxacc']*100:.1f}%/{final['boxtop2']*100:.1f}% cov2 {final['cov2']*100:.1f}% n={final['n']}", flush=True)
 naive = score(r_obs, "hold", 1e-6, 1e9)   # kp~0: raw player career share (league fill-in for empty)
