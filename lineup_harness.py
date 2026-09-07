@@ -153,4 +153,41 @@ naive = score(r_obs, "hold", 1e-6, 1e9)   # kp~0: raw player career share (leagu
 prior = score(r_obs, "hold", 1e9, 1e-6)   # kp huge: pure team-rate prior
 print(f"HOLDOUT raw-career   | top1 {naive['top1']*100:.1f}% top2 {naive['top2']*100:.1f}% ce {naive['ce']:.4f} jac {naive['jaccard']:.3f}", flush=True)
 print(f"HOLDOUT team-prior   | top1 {prior['top1']*100:.1f}% top2 {prior['top2']*100:.1f}% ce {prior['ce']:.4f} jac {prior['jaccard']:.3f}", flush=True)
+
+# ---- export as-of-END shrunk q per player (latest lineup per team) ----
+dp_b, kp_b, kt_b = best_key
+p_time = defaultdict(lambda: np.zeros(NH)); t_time = defaultdict(lambda: np.zeros(NH))
+g_time = np.zeros(NH); latest = {}
+for r in recs:
+    tn = {s: r["teams"][s]["name"] for s in ("blue", "red")}
+    g_time *= 0.995
+    for side in ("blue", "red"):
+        team = tn[side]; t_time[team] *= 0.88
+        names = []
+        for p in r["lineups"][side]:
+            pid = p["player_id"]
+            shares = r["hero_time"].get(pid, {}); tot = sum(shares.values())
+            if tot <= 0: continue
+            vec = np.zeros(NH)
+            for h, s in shares.items():
+                if h in HIDX: vec[HIDX[h]] = s / tot
+            p_time[pid] = dp_b * p_time[pid] + vec
+            t_time[team] += vec; g_time += vec
+            names.append((pid, p["name"]))
+        if names: latest[team] = names
+export = {}
+gs = g_time.sum(); g_norm = (g_time + 0.1) / (gs + 0.1 * NH)
+for team, names in latest.items():
+    s_team = (t_time[team] + kt_b * g_norm) / (t_time[team].sum() + kt_b)
+    rows = []
+    for pid, nm in names:
+        q = (p_time[pid] + kp_b * s_team) / (p_time[pid].sum() + kp_b)
+        idx = np.argsort(-q)[:8]
+        rows.append({"name": nm,
+                     "q": [[HEROES[int(i)], round(float(q[i]), 4)] for i in idx if q[i] > 0.005]})
+    export[team] = rows
+json.dump({"config": {"dp": dp_b, "kp": kp_b, "kt": kt_b},
+           "holdout": final, "player_q": export},
+          open("/content/player_q.json" if os.path.isdir("/content") else "player_q.json", "w"))
+print("Q_EXPORT_DONE", flush=True)
 print("LINEUP_DONE", flush=True)
