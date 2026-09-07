@@ -308,7 +308,7 @@ from scipy.optimize import minimize
 END = max(d["t"] for d in decisions)
 H_OBS = 30.0
 BAN_F = ["cap","thr","revu","revw","map","den","selfban"]
-PROT_F = ["cap","ls","ownw","map","selfprot","haz","hazls"]
+PROT_F = ["cap","ls","ownw","map","selfprot","haz"]
 SLOTS = {"ban": ["B1","B2","B3","B4"], "protect": ["P1","P2"]}
 RHO_BAN = 0.90
 
@@ -332,6 +332,7 @@ def fit_kind(kind, names, rows, rho):
             u = u / T
             m = u.max()
             tot += wt * (m + math.log(np.exp(u - m).sum()) - u[d["y"]])
+        tot += 0.5 * float((w ** 2).sum())   # ridge: stabilize collinear features
         return tot
     th = minimize(nll, np.zeros(nf + nT), method="L-BFGS-B").x
     return th[:nf], th[nf:], sidx
@@ -357,7 +358,7 @@ ptr = [d for d in decisions if d["kind"] == "protect"]
 bw, blT, bsx = fit_kind("ban", BAN_F, btr, RHO_BAN)
 for d in ptr:
     hz = lookahead_probs(d, BAN_F, bw, blT, bsx, RHO_BAN)[d["legal"]] if d["look"] else np.zeros(len(d["legal"]))
-    d["_x"]["haz"] = hz; d["_x"]["hazls"] = hz * d["feats"]["ls"]
+    d["_x"]["haz"] = hz
 pw, plT, psx = fit_kind("protect", PROT_F, ptr, None)
 print("ban coefs:", {nm: round(float(bw[j]),4) for j, nm in enumerate(BAN_F)},
       "T:", {sl: round(math.exp(blT[k]),3) for sl,k in bsx.items()}, flush=True)
