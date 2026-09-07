@@ -669,17 +669,24 @@ function recompute() {
     rows.sort(function (a, b) { return b.p - a.p || (a.hero < b.hero ? -1 : 1); });
     var pools_ = MODEL.player_pools && teamKey(side) ? MODEL.player_pools[teamKey(side)] : null;
     if (!pools_) return;
-    var used = {};
-    rows.forEach(function (r) {
-      if (Object.keys(projAssign[side]).length >= 6) return;
-      var best = null, bs = 0;
-      pools_.forEach(function (pl) {
-        if (used[pl.name]) return;
-        pl.heroes.forEach(function (e) {
-          if (e[0] === r.hero && e[1] > bs) { bs = e[1]; best = pl.name; }
-        });
+    var incl = {};
+    rows.forEach(function (r) { incl[r.hero] = r.p; });
+    var pairs = [];
+    pools_.forEach(function (pl) {
+      pl.heroes.forEach(function (e) {
+        if (e[1] < 0.05) return;                      // no cameo-share claims
+        if (incl[e[0]] === undefined) return;
+        pairs.push({ player: pl.name, hero: e[0], p: incl[e[0]],
+                     score: incl[e[0]] * e[1] });
       });
-      if (best) { used[best] = true; projAssign[side][best] = { hero: r.hero, p: r.p }; }
+    });
+    pairs.sort(function (a, b) { return b.score - a.score; });
+    var usedP = {}, usedH = {};
+    pairs.forEach(function (pr) {
+      if (Object.keys(projAssign[side]).length >= 6) return;
+      if (usedP[pr.player] || usedH[pr.hero]) return;
+      usedP[pr.player] = true; usedH[pr.hero] = true;
+      projAssign[side][pr.player] = { hero: pr.hero, p: pr.p };
     });
   });
 
