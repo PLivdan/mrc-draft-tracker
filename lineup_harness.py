@@ -1,6 +1,8 @@
 """Hierarchical player-hero playtime-share model (q_ih) + validation.
 
-Target: q_ih = E[playtime share of hero h for player i | draft, map, history].
+Target: q_ih = E[playtime share of hero h for player i | history + ban mask].
+(No map/opponent conditioning yet: player history shrunk to team/league,
+renormalized over the live legal pool. Do not claim more.)
 Hierarchy: player -> team -> league, count-space shrinkage on decayed shares.
 Protocol: chronological pass; hyperparams tuned on INNER window (last 120
 pre-holdout maps); the last-45-series holdout is scored ONCE with the chosen
@@ -91,29 +93,19 @@ def q_for(pl, ob, kp, kt):
     s = q.sum()
     return q / s if s > 0 else np.full(NH, 1.0 / NH)
 
+from scipy.optimize import linear_sum_assignment
+
 def assign_six(qs):
-    """Max sum log q assignment, distinct heroes, DFS over top-8 candidates."""
-    cands = []
-    for q in qs:
-        idx = np.argsort(-q)[:8]
-        cands.append([(int(i), math.log(max(q[i], 1e-9))) for i in idx])
-    best = [-1e18, None]
-    n = len(cands)
-    def dfs(i, used, sc, pick):
-        if sc + (n - i) * 0.0 < best[0] - 50: return
-        if i == n:
-            if sc > best[0]: best[0], best[1] = sc, list(pick)
-            return
-        for h, lq in cands[i]:
-            if h in used: continue
-            used.add(h); pick.append(h)
-            dfs(i + 1, used, sc + lq, pick)
-            used.discard(h); pick.pop()
-    dfs(0, set(), 0.0, [])
-    return best[1] or []
+    """Exact max-sum-log-q assignment over the full player x hero matrix (Hungarian)."""
+    C = np.stack([-np.log(np.maximum(q, 1e-9)) for q in qs])
+    rows, cols = linear_sum_assignment(C)
+    out = [0] * len(qs)
+    for r_, c_ in zip(rows, cols): out[int(r_)] = int(c_)
+    return out
 
 def score(obs, phase, kp, kt):
     top1 = top2 = nobs = 0; ce = 0.0; jac = 0.0; nteam = 0
+    boxacc = boxtop2 = 0; cov2 = 0.0
     for ob in obs:
         if ob["phase"] != phase: continue
         qs = []
@@ -122,16 +114,24 @@ def score(obs, phase, kp, kt):
             a = pl["a"]
             am = int(np.argmax(a)); order = np.argsort(-q)
             top1 += (int(order[0]) == am); top2 += (am in set(int(x) for x in order[:2]))
+            cov2 += float(a[int(order[0])] + (a[int(order[1])] if len(order) > 1 else 0.0))
             ce += float(-(a * np.log(q + 1e-9)).sum()); nobs += 1
-        # six-set jaccard: predicted assignment vs actual top-6 team heroes by time
-        pred = set(assign_six(qs))
+        # exact joint assignment; score the boxes the UI would draw
+        pick = assign_six(qs)
+        for i, pl in enumerate(ob["players"]):
+            am_ = int(np.argmax(pl["a"]))
+            alt = next((int(x) for x in np.argsort(-qs[i]) if int(x) != pick[i]), None)
+            boxacc += (pick[i] == am_); boxtop2 += (am_ in (pick[i], alt))
+        pred = set(pick)
         atot = np.zeros(NH)
         for pl in ob["players"]: atot += pl["a"]
         act = set(int(i) for i in np.argsort(-atot)[:len(ob["players"])] if atot[i] > 0)
         if act:
             jac += len(pred & act) / len(pred | act); nteam += 1
     return {"n": nobs, "top1": top1 / max(nobs, 1), "top2": top2 / max(nobs, 1),
-            "ce": ce / max(nobs, 1), "jaccard": jac / max(nteam, 1)}
+            "ce": ce / max(nobs, 1), "jaccard": jac / max(nteam, 1),
+            "boxacc": boxacc / max(nobs, 1), "boxtop2": boxtop2 / max(nobs, 1),
+            "cov2": cov2 / max(nobs, 1)}
 
 t0 = time.time()
 results = {}
@@ -141,18 +141,18 @@ for dp in (0.88, 0.95, 0.99):
         for kt in (5.0, 20.0, 50.0):
             r = score(obs, "inner", kp, kt)
             results[(dp, kp, kt)] = (r, obs)
-            print(f"inner dp={dp} kp={kp} kt={kt} | top1 {r['top1']*100:.1f}% top2 {r['top2']*100:.1f}% ce {r['ce']:.4f} jac {r['jaccard']:.3f} n={r['n']}", flush=True)
+            print(f"inner dp={dp} kp={kp} kt={kt} | top1 {r['top1']*100:.1f}% top2 {r['top2']*100:.1f}% ce {r['ce']:.4f} box {r['boxacc']*100:.1f}%/{r['boxtop2']*100:.1f}% cov2 {r['cov2']*100:.1f}% n={r['n']}", flush=True)
 best_key = min(results, key=lambda k: results[k][0]["ce"])
 print(f"\nBEST on inner: dp={best_key[0]} kp={best_key[1]} kt={best_key[2]}  [{time.time()-t0:.0f}s]", flush=True)
 
 # baselines on holdout + chosen model, scored ONCE
 r_obs = results[best_key][1]
 final = score(r_obs, "hold", best_key[1], best_key[2])
-print(f"HOLDOUT q-model      | top1 {final['top1']*100:.1f}% top2 {final['top2']*100:.1f}% ce {final['ce']:.4f} jac {final['jaccard']:.3f} n={final['n']}", flush=True)
+print(f"HOLDOUT q-model      | top1 {final['top1']*100:.1f}% top2 {final['top2']*100:.1f}% ce {final['ce']:.4f} box {final['boxacc']*100:.1f}%/{final['boxtop2']*100:.1f}% cov2 {final['cov2']*100:.1f}% n={final['n']}", flush=True)
 naive = score(r_obs, "hold", 1e-6, 1e9)   # kp~0: raw player career share (league fill-in for empty)
 prior = score(r_obs, "hold", 1e9, 1e-6)   # kp huge: pure team-rate prior
-print(f"HOLDOUT raw-career   | top1 {naive['top1']*100:.1f}% top2 {naive['top2']*100:.1f}% ce {naive['ce']:.4f} jac {naive['jaccard']:.3f}", flush=True)
-print(f"HOLDOUT team-prior   | top1 {prior['top1']*100:.1f}% top2 {prior['top2']*100:.1f}% ce {prior['ce']:.4f} jac {prior['jaccard']:.3f}", flush=True)
+print(f"HOLDOUT raw-career   | top1 {naive['top1']*100:.1f}% top2 {naive['top2']*100:.1f}% ce {naive['ce']:.4f} box {naive['boxacc']*100:.1f}%/{naive['boxtop2']*100:.1f}% cov2 {naive['cov2']*100:.1f}%", flush=True)
+print(f"HOLDOUT team-prior   | top1 {prior['top1']*100:.1f}% top2 {prior['top2']*100:.1f}% ce {prior['ce']:.4f} box {prior['boxacc']*100:.1f}%/{prior['boxtop2']*100:.1f}% cov2 {prior['cov2']*100:.1f}%", flush=True)
 
 # ---- export as-of-END shrunk q per player (latest lineup per team) ----
 dp_b, kp_b, kt_b = best_key
