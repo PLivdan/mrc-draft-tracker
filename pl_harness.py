@@ -350,6 +350,9 @@ def look_probs(d, names, w, logT, sidx, pl, kalpha_by_slot):
         u = base.copy()
         for j, nm in enumerate(names):
             if nm == "den": continue
+            if nm == "plh":
+                u = u + w[j] * KALPHA_FULL
+                continue
             if nm in lk: u = u + w[j] * lk[nm]
         T = math.exp(logT[sidx[osl]])
         u = np.where(lk["mask"], u / T, -np.inf)
@@ -361,24 +364,28 @@ def look_probs(d, names, w, logT, sidx, pl, kalpha_by_slot):
 kind_c_final = kind_c["ban"]; ktot = kind_n["ban"] + 0.25 * NH
 KALPHA_FULL = np.log((kind_c_final + 0.25) / ktot)   # end-state PL habit (lookahead approx)
 
-def run(pl, label):
+def run(pl, label, blend=False):
     res = {"all": {"ban": [0.0,0,0,0], "protect": [0.0,0,0,0]},
            "surprise": {"ban": [0.0,0,0,0], "protect": [0.0,0,0,0]}}
+    namesB = BAN_F + ["plh"] if blend else BAN_F
     t_run = time.time()
     for bi, blk_ in enumerate(BLOCKS):
         blk = set(blk_)
         cutoff = min(d["t"] for d in decisions if d["series"] in blk)
         for d in decisions: d["_cut"] = cutoff; d["_x"] = {}
+        if blend:
+            for d in decisions:
+                if d["kind"] == "ban": d["_x"]["plh"] = d["alpha_pl"]
         btr = [d for d in decisions if d["kind"]=="ban" and d["t"] < cutoff]
         ptr = [d for d in decisions if d["kind"]=="protect" and d["t"] < cutoff]
         bte = [d for d in decisions if d["kind"]=="ban" and d["series"] in blk]
         pte = [d for d in decisions if d["kind"]=="protect" and d["series"] in blk]
-        bw, blT, bsx = fit_kind("ban", BAN_F, btr, pl)
+        bw, blT, bsx = fit_kind("ban", namesB, btr, pl)
         for d in ptr + pte:
-            hz = look_probs(d, BAN_F, bw, blT, bsx, pl, KALPHA_FULL)[d["legal"]] if d["look"] else np.zeros(len(d["legal"]))
+            hz = look_probs(d, namesB, bw, blT, bsx, pl, KALPHA_FULL)[d["legal"]] if d["look"] else np.zeros(len(d["legal"]))
             d["_x"]["haz"] = hz
         pw, plT, psx = fit_kind("protect", PROT_F, ptr, pl)
-        for d, names_, w_, lT_, sx_ in             [(x, BAN_F, bw, blT, bsx) for x in bte] + [(x, PROT_F, pw, plT, psx) for x in pte]:
+        for d, names_, w_, lT_, sx_ in             [(x, namesB, bw, blT, bsx) for x in bte] + [(x, PROT_F, pw, plT, psx) for x in pte]:
             T = math.exp(lT_[sx_[d["slot"]]])
             u = habit_of(d, pl).copy()
             for j, nm in enumerate(names_):
@@ -399,6 +406,9 @@ def run(pl, label):
             if n: line += f" | {kind}: ll {nl/n:.4f} top1 {100*t1/n:.1f}% top3 {100*t3/n:.1f}% n={n}"
         print(line, flush=True)
 
-run(False, "SLOT habit (hybrid ref)")
-run(True,  "PL habit")
+import sys
+mode = sys.argv[1] if len(sys.argv) > 1 else "both"
+if mode in ("both", "ref"): run(False, "SLOT habit (hybrid ref)")
+if mode in ("both", "pl"):  run(True,  "PL habit")
+if mode == "blend":         run(False, "BLEND slot+PL", blend=True)
 print("PL_DONE", flush=True)
