@@ -224,6 +224,7 @@ for ri, r in enumerate(recs):
                                     for i in range(NH)])
                 look = {"slots": oslots, "mask": banmask,
                         "alpha": {osl: alpha_asof(osl) for osl in oslots},
+                        "kalpha": np.log((kind_c["ban"] + 0.25) / (kind_n["ban"] + 0.25 * NH)),
                         "cap": caps[side], "thr": thr[side],
                         "revu": rev_used[oo], "revw": rev_won[oo],
                         "selfban": selfb[oo], "map": mo}
@@ -273,17 +274,11 @@ for ri, r in enumerate(recs):
         else: team_protc[tm][i] += 1
         slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
         kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
-        tm = tn[a["side"]]
-        if a["kind"] == "ban": team_banc[tm][i] += 1
-        else: team_protc[tm][i] += 1
-        slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
-        kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
     mp = r.get("map_name")
     for side in ("blue", "red"):
         team = tn[side]
         won = r.get("winner_side") == side
         team_use[team] *= DELTA; team_win[team] *= DELTA
-        team_banc[team] *= DELTA; team_protc[team] *= DELTA
         team_banc[team] *= DELTA; team_protc[team] *= DELTA
         team_time[team] *= DELTA; team_n[team] = team_n[team] * DELTA + 1
         credit = {}
@@ -346,12 +341,12 @@ def fit_kind(kind, names, rows, pl):
 def look_probs(d, names, w, logT, sidx, pl, kalpha_by_slot):
     lk = d["look"]; surv = np.ones(NH)
     for osl in lk["slots"]:
-        base = kalpha_by_slot if pl else lk["alpha"][osl]
+        base = lk["kalpha"] if pl else lk["alpha"][osl]
         u = base.copy()
         for j, nm in enumerate(names):
             if nm == "den": continue
             if nm == "plh":
-                u = u + w[j] * KALPHA_FULL
+                u = u + w[j] * lk["kalpha"]
                 continue
             if nm in lk: u = u + w[j] * lk[nm]
         T = math.exp(logT[sidx[osl]])
@@ -407,8 +402,8 @@ def run(pl, label, blend=False):
         print(line, flush=True)
 
 import sys
-mode = sys.argv[1] if len(sys.argv) > 1 else "both"
-if mode in ("both", "ref"): run(False, "SLOT habit (hybrid ref)")
-if mode in ("both", "pl"):  run(True,  "PL habit")
-if mode == "blend":         run(False, "BLEND slot+PL", blend=True)
+mode = sys.argv[1] if len(sys.argv) > 1 else "all"
+if mode in ("all", "both", "ref"): run(False, "SLOT habit (fixed)")
+if mode in ("all", "both", "pl"):  run(True,  "PL habit (fixed)")
+if mode in ("all", "blend"):       run(False, "BLEND slot+PL (fixed)", blend=True)
 print("PL_DONE", flush=True)
