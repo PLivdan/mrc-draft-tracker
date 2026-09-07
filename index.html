@@ -421,7 +421,6 @@ function exitWhatIf() {
 var lastState = null;
 
 function recompute() {
-  denialMemo = {};
   var bansBy = { blue: [], red: [] }, protsBy = { blue: [], red: [] };
   var msgs = {}, applied = {}, currentPhase = PHASES.length, blocked = false;
 
