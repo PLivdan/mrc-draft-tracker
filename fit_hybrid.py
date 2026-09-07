@@ -62,10 +62,8 @@ def alpha_asof(slot):
     kind = "ban" if slot.startswith("B") else "protect"
     tot = kind_n[kind] + 0.25 * NH
     pa = (kind_c[kind] + 0.25) / tot
-    if slot.startswith("B"):
-        p = (slot_c[slot] + 4.0 * pa) / (slot_avail[slot] + 4.0)  # exposure-adjusted: chosen given available
-    else:
-        p = (slot_c[slot] + 4.0 * pa) / (slot_n[slot] + 4.0)
+    # exposure-adjusted for ALL slots: chosen given available (bans AND protects)
+    p = (slot_c[slot] + 4.0 * pa) / (slot_avail[slot] + 4.0)
     return np.log(p)
 
 def alpha_asof_slow(slot):
@@ -266,13 +264,14 @@ for ri, r in enumerate(recs):
             (bans if a["kind"] == "ban" else prots)[a["side"]].append(a["hero"])
     prev_in_series[r["match_id"]] = r
     # ---- post-update rolling profiles with this map ----
+    pend_ban = defaultdict(lambda: np.zeros(NH)); pend_prot = defaultdict(lambda: np.zeros(NH))
     for a in r["actions"]:
         i = HIDX[a["hero"]]
         slot_c[a["slot"]][i] += 1; slot_n[a["slot"]] += 1
         kind_c[a["kind"]][i] += 1; kind_n[a["kind"]] += 1
         tm = tn[a["side"]]
-        if a["kind"] == "ban": team_banc[tm][i] += 1
-        else: team_protc[tm][i] += 1
+        if a["kind"] == "ban": pend_ban[tm][i] += 1
+        else: pend_prot[tm][i] += 1
         slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
         kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
     for _sl, _lg in expo_updates: slot_avail[_sl][_lg] += 1
@@ -282,6 +281,7 @@ for ri, r in enumerate(recs):
         won = r.get("winner_side") == side
         team_use[team] *= DELTA; team_win[team] *= DELTA
         team_banc[team] *= DELTA; team_protc[team] *= DELTA
+        team_banc[team] += pend_ban[team]; team_protc[team] += pend_prot[team]
         team_time[team] *= DELTA; team_n[team] = team_n[team] * DELTA + 1
         credit = {}
         for pid in [p["player_id"] for p in r["lineups"][side]]:
@@ -389,7 +389,7 @@ for kind, slots in SLOTS.items():
         alphas_slow[sl] = [round(float(x),4) for x in alpha_asof_slow(sl)]
 coef = {"ban": {sl: dict({nm: round(float(bw[j]),4) for j, nm in enumerate(BAN_F)}, den=0.0) for sl in SLOTS["ban"]},
         "protect": {sl: {nm: round(float(pw[j]),4) for j, nm in enumerate(PROT_F)} for sl in SLOTS["protect"]}}
-out = {"fitted_on": "868 maps; hybrid v2: exposure-adjusted ban habit (chosen-given-available), dedup-fixed state, denial removed, time-credited usage, two-clock mix (rho .90), hazard protects, slot temperatures",
+out = {"fitted_on": "868 maps; hybrid v3: exposure-adjusted habits on ALL six slots (chosen-given-available), fixed team-history recurrence, denial removed, time-credited usage, hazard protects, slot temperatures. Note: revu/revw = recent-opponent-use + outcome differential (predictive, not revenge)",
     "tau": TAU, "patterns": [[list(c), r] for c, r in PATTERNS],
     "coef": coef,
     "temps": {"ban": {sl: round(math.exp(blT[k]),3) for sl,k in bsx.items()},
