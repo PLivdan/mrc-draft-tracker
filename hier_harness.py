@@ -59,6 +59,7 @@ team_use = defaultdict(lambda: np.zeros(NH)); team_n = defaultdict(float)
 team_time = defaultdict(lambda: np.zeros(NH)); team_win = defaultdict(lambda: np.zeros(NH))
 team_banc = defaultdict(lambda: np.zeros(NH)); team_protc = defaultdict(lambda: np.zeros(NH))
 map_c = defaultdict(lambda: np.zeros(NH)); map_n = defaultdict(float)
+slot_avail = defaultdict(lambda: np.zeros(NH))
 prev_in_series = {}
 last_t = None
 
@@ -80,6 +81,12 @@ def mapoff_asof(mapname):
     return np.clip(np.log(gm / gref), -1.5, 1.5)
 def prio(kind):
     return (kind_c[kind] + 0.25) / (kind_n[kind] + 0.25 * NH)
+def hab_asof(slot):
+    kind = "ban" if slot.startswith("B") else "protect"
+    pa = prio(kind)
+    if slot.startswith("B"):
+        return np.log((slot_c[slot] + 4.0 * pa) / (slot_avail[slot] + 4.0))
+    return np.log((slot_c[slot] + 4.0 * pa) / (slot_n[slot] + 4.0))
 
 # ---------- feature pass ----------
 decisions = []
@@ -92,12 +99,14 @@ for r in recs:
         for k in kind_c: kind_c[k] *= f
         for k in kind_n: kind_n[k] *= f
         g_num *= f; g_den *= f
+        for k in slot_avail: slot_avail[k] *= f
         fm = time_decay((t - last_t) / DAY, H_MAP)
         for k in map_c: map_c[k] *= fm
         for k in list(map_n): map_n[k] *= fm
     last_t = t
     g = g_asof()
     tn = {s: r["teams"][s]["name"] for s in ("blue", "red")}
+    expo_updates = []
     prev = prev_in_series.get(r["match_id"])
     rev_used = {"blue": np.zeros(NH), "red": np.zeros(NH)}
     rev_won = {"blue": np.zeros(NH), "red": np.zeros(NH)}
@@ -153,12 +162,15 @@ for r in recs:
                               "revu": rev_used[oo].copy(), "revw": rev_won[oo].copy()},
                         "tbc": team_banc[tn[oo]].copy(), "tbn": float(team_n[tn[oo]]),
                         "pk": pk["ban"].copy()}
+            if look is not None:
+                look["habs"] = {osl: hab_asof(osl) for osl in look["slots"]}
             top_meta = int(np.argmax(kind_c["ban"]))
             surprise = bool(mask[top_meta]) and not (kind == "ban" and slot == "B1")
             decisions.append({"kind": kind, "slot": slot, "series": r["match_id"], "t": t,
-                              "mask": mask, "yg": HIDX[hero], "F": F,
+                              "mask": mask, "yg": HIDX[hero], "F": F, "hab": hab_asof(slot),
                               "tbc": tbc, "tbn": tbn, "pk": pk[kind].copy(),
                               "surprise": surprise, "look": look})
+            expo_updates.append((slot, np.where(mask)[0]))
         for a in acts:
             (bans if a["kind"] == "ban" else prots)[a["side"]].append(a["hero"])
     prev_in_series[r["match_id"]] = r
@@ -169,6 +181,7 @@ for r in recs:
         tm = tn[a["side"]]
         if a["kind"] == "ban": team_banc[tm][i] += 1
         else: team_protc[tm][i] += 1
+    for _sl, _lg in expo_updates: slot_avail[_sl][_lg] += 1
     mp = r.get("map_name")
     for side in ("blue", "red"):
         team = tn[side]
@@ -205,28 +218,25 @@ def a_state(tbc, tbn, pkv, kt):
 
 def build(rows, names, kt, cut, extra=None):
     n = len(rows); S = len(SLOTS[rows[0]["kind"]])
-    nf = len(names) + 1 + (1 if extra is not None else 0)
+    nf = len(names) + 2 + (1 if extra is not None else 0)
     X = np.zeros((n, NH, nf)); MASK = np.zeros((n, NH), bool)
     Y = np.zeros(n, int); SL = np.zeros(n, int); W = np.zeros(n)
     sidx = SIDX[rows[0]["kind"]]
     for k, d in enumerate(rows):
         for j, nm in enumerate(names): X[k, :, j] = d["F"][nm]
-        X[k, :, len(names)] = a_state(d["tbc"], d["tbn"], d["pk"], kt)
+        X[k, :, len(names)] = d["hab"]
+        X[k, :, len(names) + 1] = a_state(d["tbc"], d["tbn"], d["pk"], kt)
         if extra is not None: X[k, :, -1] = extra[k]
         MASK[k] = d["mask"]; Y[k] = d["yg"]; SL[k] = sidx[d["slot"]]
         W[k] = 0.5 ** ((cut - d["t"]) / DAY / H_OBS)
     return X, MASK, Y, SL, W, S, nf
 
 def fit(X, MASK, Y, SL, W, S, nf, lam_d):
+    """Two-stage: (1) convex fit of mu/delta/beta at T=1; (2) temps alone, frozen rest."""
     n = X.shape[0]
     n_mu, n_d = NH, S * NH
-    def unpack(th):
-        mu = th[:n_mu]; dl = th[n_mu:n_mu+n_d].reshape(S, NH)
-        be = th[n_mu+n_d:n_mu+n_d+nf]; lT = np.concatenate([[0.0], th[n_mu+n_d+nf:]])
-        return mu, dl, be, lT
     onehot = np.zeros((n, NH)); onehot[np.arange(n), Y] = 1.0
-    def obj(th):
-        mu, dl, be, lT = unpack(th)
+    def core(mu, dl, be, lT):
         T = np.exp(lT)[SL]
         U = mu[None, :] + dl[SL] + X @ be
         Us = np.where(MASK, U / T[:, None], -np.inf)
@@ -234,34 +244,43 @@ def fit(X, MASK, Y, SL, W, S, nf, lam_d):
         E = np.exp(Us - m); Z = E.sum(1)
         P = E / Z[:, None]
         nll = float((W * (np.log(Z) + m[:, 0] - Us[np.arange(n), Y])).sum())
-        G = (P - onehot) * (W / T)[:, None]
+        return nll, P, U, T
+    def obj1(th):
+        mu = th[:n_mu]; dl = th[n_mu:n_mu+n_d].reshape(S, NH); be = th[n_mu+n_d:]
+        nll, P, U, T = core(mu, dl, be, np.zeros(S))
+        G = (P - onehot) * W[:, None]
         g_mu = G.sum(0)
-        g_dl = np.zeros((S, NH))
-        np.add.at(g_dl, SL, G)
+        g_dl = np.zeros((S, NH)); np.add.at(g_dl, SL, G)
         g_be = np.einsum("nh,nhf->f", G, X)
-        uy = U[np.arange(n), Y]
-        pu = (P * np.where(MASK, U, 0.0)).sum(1)
-        gT_rows = W * (uy - pu) / T
-        g_lT = np.zeros(S)
-        np.add.at(g_lT, SL, gT_rows)
         nll += LAM_MU * float((mu**2).sum()) + lam_d * float((dl**2).sum()) + LAM_BETA * float((be**2).sum())
         g_mu += 2*LAM_MU*mu; g_dl += 2*lam_d*dl; g_be += 2*LAM_BETA*be
-        return nll, np.concatenate([g_mu, g_dl.ravel(), g_be, g_lT[1:]])
-    th0 = np.zeros(n_mu + n_d + nf + (S - 1))
-    res = minimize(obj, th0, jac=True, method="L-BFGS-B",
-                   options={"maxiter": 400})
-    return unpack(res.x)
+        return nll, np.concatenate([g_mu, g_dl.ravel(), g_be])
+    r1 = minimize(obj1, np.zeros(n_mu + n_d + nf), jac=True, method="L-BFGS-B",
+                  options={"maxiter": 3000, "maxfun": 6000})
+    mu = r1.x[:n_mu]; dl = r1.x[n_mu:n_mu+n_d].reshape(S, NH); be = r1.x[n_mu+n_d:]
+    def obj2(thT):
+        lT = np.concatenate([[0.0], thT])
+        nll, P, U, T = core(mu, dl, be, lT)
+        uy = U[np.arange(n), Y]
+        pu = (P * np.where(MASK, U, 0.0)).sum(1)
+        g_lT = np.zeros(S); np.add.at(g_lT, SL, W * (uy - pu) / T)
+        nll += 1.0 * float((lT**2).sum())
+        return nll, g_lT[1:] + 2.0 * lT[1:]
+    r2 = minimize(obj2, np.zeros(S - 1), jac=True, method="L-BFGS-B",
+                  options={"maxiter": 200})
+    lT = np.concatenate([[0.0], r2.x])
+    return mu, dl, be, lT
 
 def haz_exact(d, mu, dl, be, lT, kt, names):
     lk = d["look"]
     A = a_state(lk["tbc"], lk["tbn"], lk["pk"], kt)
     xb = np.zeros(NH)
     for j, nm in enumerate(names): xb += be[j] * lk["F"].get(nm, np.zeros(NH))
-    xb += be[len(names)] * A
+    xb += be[len(names) + 1] * A
     sidx = SIDX["ban"]; mask = lk["mask"]
     def pvec(osl):
         T = math.exp(lT[sidx[osl]])
-        u = np.where(mask, (mu + dl[sidx[osl]] + xb) / T, -np.inf)
+        u = np.where(mask, (mu + dl[sidx[osl]] + be[len(names)] * lk["habs"][osl] + xb) / T, -np.inf)
         m = u[mask].max() if mask.any() else 0.0
         e = np.exp(u - m); return e / e.sum(), e
     slots = lk["slots"]
@@ -288,7 +307,8 @@ def eval_block(rows_tr_b, rows_te_b, rows_tr_p, rows_te_p, cut, lam_d, kt, names
         for k, d in enumerate(rows_te):
             xb = np.zeros(NH)
             for j, nm in enumerate(names): xb += b_[j] * d["F"][nm]
-            xb += b_[len(names)] * a_state(d["tbc"], d["tbn"], d["pk"], kt)
+            xb += b_[len(names)] * d["hab"]
+            xb += b_[len(names) + 1] * a_state(d["tbc"], d["tbn"], d["pk"], kt)
             if extra is not None: xb += b_[-1] * extra[k]
             T = math.exp(t_[sidx[d["slot"]]])
             u = np.where(d["mask"], (m_ + d_[sidx[d["slot"]]] + xb) / T, -np.inf)
@@ -333,18 +353,22 @@ if mode == "eval":
     print("--- inner tuning (last 15 pre-holdout series, one shot each) ---", flush=True)
     inner_blk = [set(s for s in series_order if s in INNER)]
     best = (None, 1e18)
-    for lam_d in (2.0, 8.0, 32.0):
-        for kt in (8.0, 32.0):
-            r = run_eval(inner_blk, f"inner ld={lam_d} kt={kt}", lam_d, kt)
-            comp = r["all"]["ban"][0]/max(r["all"]["ban"][1],1) + r["all"]["protect"][0]/max(r["all"]["protect"][1],1)
-            if comp < best[1]: best = ((lam_d, kt), comp)
-    lam_d, kt = best[0]
-    print(f"\nBEST inner: lam_delta={lam_d} k_team={kt}", flush=True)
-    run_eval(BLOCKS, f"HIER holdout ld={lam_d} kt={kt}", lam_d, kt)
+    for hob in (10.0, 30.0):
+        for lam_d in (2.0, 8.0):
+            for kt in (8.0, 32.0):
+                globals()["H_OBS"] = hob
+                r = run_eval(inner_blk, f"inner H={hob:.0f} ld={lam_d} kt={kt}", lam_d, kt)
+                comp = r["all"]["ban"][0]/max(r["all"]["ban"][1],1) + r["all"]["protect"][0]/max(r["all"]["protect"][1],1)
+                if comp < best[1]: best = ((hob, lam_d, kt), comp)
+    hob, lam_d, kt = best[0]
+    globals()["H_OBS"] = hob
+    print(f"\nBEST inner: H_OBS={hob} lam_delta={lam_d} k_team={kt}", flush=True)
+    run_eval(BLOCKS, f"HIER holdout H={hob:.0f} ld={lam_d} kt={kt}", lam_d, kt)
     run_eval(BLOCKS, f"HIER+revenge holdout", lam_d, kt, names_b=BAN_REV)
     print("HIER_DONE", flush=True)
 elif mode == "export":
     lam_d = float(sys.argv[2]); kt = float(sys.argv[3])
+    if len(sys.argv) > 4: globals()["H_OBS"] = float(sys.argv[4])
     END = max(d["t"] for d in decisions)
     tr_b = [d for d in decisions if d["kind"] == "ban"]
     tr_p = [d for d in decisions if d["kind"] == "protect"]
@@ -353,9 +377,9 @@ elif mode == "export":
     hz = [haz_exact(d, mu, dl, be, lT, kt, BAN_F) if d["look"] else np.zeros(NH) for d in tr_p]
     Xp, Mp, Yp, Sp, Wp, S2, nf2 = build(tr_p, PROT_F, kt, END, extra=hz)
     mu2, dl2, be2, lT2 = fit(Xp, Mp, Yp, Sp, Wp, S2, nf2, lam_d)
-    print("ban beta [cap,thr,map,A]:", [round(float(x),4) for x in be],
+    print("ban beta [cap,thr,map,hab,A]:", [round(float(x),4) for x in be],
           "T:", [round(math.exp(x),3) for x in lT], flush=True)
-    print("prot beta [ownw,map,A,haz]:", [round(float(x),4) for x in be2],
+    print("prot beta [ownw,map,hab,A,haz]:", [round(float(x),4) for x in be2],
           "T:", [round(math.exp(x),3) for x in lT2], flush=True)
     g = g_asof(); logg = np.log(g)
     teams_out = {}
@@ -371,15 +395,15 @@ elif mode == "export":
             "v": [round(float(x),4) for x in (logg + 0.76 * cap)]}
     alphas = {}
     for sl in SLOTS["ban"]:
-        alphas[sl] = [round(float(x),4) for x in (mu + dl[SIDX["ban"][sl]])]
+        alphas[sl] = [round(float(x),4) for x in (mu + dl[SIDX["ban"][sl]] + be[len(BAN_F)] * hab_asof(sl))]
     for sl in SLOTS["protect"]:
-        alphas[sl] = [round(float(x),4) for x in (mu2 + dl2[SIDX["protect"][sl]])]
+        alphas[sl] = [round(float(x),4) for x in (mu2 + dl2[SIDX["protect"][sl]] + be2[len(PROT_F)] * hab_asof(sl))]
     coef = {"ban": {sl: {"cap": round(float(be[0]),4), "thr": round(float(be[1]),4),
                           "revu": 0.0, "revw": 0.0, "map": round(float(be[2]),4),
-                          "selfban": round(float(be[3]),4), "den": 0.0} for sl in SLOTS["ban"]},
+                          "selfban": round(float(be[4]),4), "den": 0.0} for sl in SLOTS["ban"]},
             "protect": {sl: {"cap": 0.0, "ls": 0.0, "ownw": round(float(be2[0]),4),
-                              "map": round(float(be2[1]),4), "selfprot": round(float(be2[2]),4),
-                              "haz": round(float(be2[3]),4)} for sl in SLOTS["protect"]}}
+                              "map": round(float(be2[1]),4), "selfprot": round(float(be2[3]),4),
+                              "haz": round(float(be2[4]),4)} for sl in SLOTS["protect"]}}
     out = {"fitted_on": "868 maps; hierarchical v3: in-likelihood hero priorities + shrunk hero-x-slot deviations + team-deviation states, exact hazard recursion, revenge/denial removed",
         "tau": TAU, "patterns": [[list(c), r] for c, r in PATTERNS],
         "coef": coef,
