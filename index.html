@@ -23,7 +23,7 @@
          font-size: 13px; line-height: 1.3; margin: 14px 12px; }
   main { max-width: 1060px; margin: 0 auto; }
   h1 { font-size: 17px; font-weight: 600; margin: 0 0 10px 0; }
-  h2 { font-size: 13px; font-weight: 600; margin: 14px 0 4px 0;
+  h2 { font-size: 13px; font-weight: 600; margin: 18px 0 4px 0;
        border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
   table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
   th { text-align: left; font-weight: 600; border-bottom: 1px solid var(--ink);
@@ -36,6 +36,7 @@
   input:focus, select:focus, button:focus { outline: 2px solid var(--blue); }
   button { font-family: inherit; font-size: 12px; background: var(--paper);
            color: var(--ink); border: 1px solid var(--ink); padding: 1px 8px; cursor: pointer; }
+  button:hover { background: var(--active); }
   .err { color: var(--red); font-size: 11px; }
   .ok { color: var(--safe); font-size: 11px; }
   .small { font-size: 11.5px; color: var(--faint); }
@@ -70,7 +71,7 @@
 </style>
 
 <main id="mainEl">
-<h1>MRC Draft Tracker</h1>
+<h1 id="pageTitle">MRC Draft Tracker</h1>
 
 <p>
   <span class="sideB">Blue</span>
@@ -81,11 +82,11 @@
   &nbsp; <button id="resetBtn">Reset</button> <button id="themeBtn">Dark</button>
 </p>
 
-<p class="small">Series context: previous map winner
-  <select id="prevWin"><option value="">none / first map</option>
+<p class="small">Last map
+  <select id="prevWin"><option value="">first map</option>
     <option value="blue">Blue won</option><option value="red">Red won</option></select>
-  &nbsp; Blue heroes last map <input type="text" id="prevBlue" style="width:200px" placeholder="comma separated">
-  &nbsp; Red heroes last map <input type="text" id="prevRed" style="width:200px" placeholder="comma separated">
+  &nbsp; Blue heroes <input type="text" id="prevBlue" style="width:200px" placeholder="comma separated">
+  &nbsp; Red heroes <input type="text" id="prevRed" style="width:200px" placeholder="comma separated">
   <span class="small" id="prevMsg"></span>
 </p>
 
@@ -105,17 +106,12 @@
 
 <h2>Pools</h2>
 <p class="small" id="poolSummary"></p>
-<p class="small"><span class="x">✕</span> banned &nbsp; <span class="p">P</span> protected, safe from bans</p>
+<p class="small"><span class="x">✕</span> banned &nbsp; <span class="p">P</span> protected</p>
 <div class="poolcols" id="pools"></div>
 
 <h2>Projected core lineup</h2>
-<p class="small">Heroes each player has played this season (latest lineup, share of playtime).
-Bans against the team strike heroes out as the draft advances.
-Solid box = projected primary hero; dashed box = likely alternative. The number after a box
-is the model&rsquo;s expected share of the map the player spends on that hero
-(player&rarr;team&rarr;league shrunk playtime model, renormalized over the live legal pool;
-players swap mid-map, so primaries are tendencies, not certainties).
-Validated on held-out maps (last 45 series, scored once): boxed primary correct 38.0%, within box+alternative 59.0%, and the two boxes cover 56.4% of actual playtime (n=1,884 player-maps) &mdash; useful tendencies, not certainties.</p>
+<p class="small">Solid box = projected primary, dashed box = alternative, % = expected share of playtime.
+Held-out check: primary right 38%, either box 59%, boxes cover 56% of playtime.</p>
 <div class="treecols">
   <div id="treeBlue"></div>
   <div id="treeRed"></div>
@@ -535,6 +531,7 @@ function recompute() {
     });
     document.getElementById("row" + i).className = (i === currentPhase) ? "now" : "";
   });
+  document.getElementById("pageTitle").title = "fitted on " + MODEL.fitted_on;
   document.getElementById("blueHdr").innerHTML = '<span class="sideB">' + teamName("blue") + "</span>";
   document.getElementById("redHdr").innerHTML = '<span class="sideR">' + teamName("red") + "</span>";
 
@@ -614,8 +611,7 @@ function recompute() {
       }
       html += "</table></div>";
     });
-    html += '</div><div class="small">Click a hero to play that line. τ = ' + MODEL.tau +
-      ', fitted on ' + MODEL.fitted_on + '.</div></td>';
+    html += '</div><div class="small">Click a hero to play that line.</div></td>';
     var fcRow = document.createElement("tr");
     fcRow.id = "forecastRow";
     fcRow.className = "fcrow";
