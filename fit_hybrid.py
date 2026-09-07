@@ -54,6 +54,7 @@ team_protc = defaultdict(lambda: np.zeros(NH))
 team_banc = defaultdict(lambda: np.zeros(NH))
 team_protc = defaultdict(lambda: np.zeros(NH))
 prev_in_series = {}                            # match_id -> last map record
+slot_avail = defaultdict(lambda: np.zeros(NH))  # decayed per-hero legality exposure per slot
 
 def time_decay(dt_days, H): return 0.5 ** (dt_days / H)
 
@@ -61,7 +62,10 @@ def alpha_asof(slot):
     kind = "ban" if slot.startswith("B") else "protect"
     tot = kind_n[kind] + 0.25 * NH
     pa = (kind_c[kind] + 0.25) / tot
-    p = (slot_c[slot] + 4.0 * pa) / (slot_n[slot] + 4.0)
+    if slot.startswith("B"):
+        p = (slot_c[slot] + 4.0 * pa) / (slot_avail[slot] + 4.0)  # exposure-adjusted: chosen given available
+    else:
+        p = (slot_c[slot] + 4.0 * pa) / (slot_n[slot] + 4.0)
     return np.log(p)
 
 def alpha_asof_slow(slot):
@@ -143,6 +147,7 @@ for ri, r in enumerate(recs):
         for k in list(slot_n): slot_n[k] *= f
         for k in kind_c: kind_c[k] *= f
         for k in kind_n: kind_n[k] *= f
+        for k in slot_avail: slot_avail[k] *= f
         fS = time_decay((t - last_t) / DAY, H_SLOW)
         for k in slot_cS: slot_cS[k] *= fS
         for k in list(slot_nS): slot_nS[k] *= fS
@@ -155,6 +160,7 @@ for ri, r in enumerate(recs):
     last_t = t
     g = g_asof()
     tn = {s: r["teams"][s]["name"] for s in ("blue", "red")}
+    expo_updates = []
     prev = prev_in_series.get(r["match_id"])
     rev_used = {"blue": np.zeros(NH), "red": np.zeros(NH)}
     rev_won = {"blue": np.zeros(NH), "red": np.zeros(NH)}
@@ -255,6 +261,7 @@ for ri, r in enumerate(recs):
                 "y": legal.index(HIDX[hero]),
                 "legal": np.array(legal), "look": look,
             })
+            expo_updates.append((slot, np.array(legal)))
         for a in acts:
             (bans if a["kind"] == "ban" else prots)[a["side"]].append(a["hero"])
     prev_in_series[r["match_id"]] = r
@@ -268,6 +275,7 @@ for ri, r in enumerate(recs):
         else: team_protc[tm][i] += 1
         slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
         kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
+    for _sl, _lg in expo_updates: slot_avail[_sl][_lg] += 1
     mp = r.get("map_name")
     for side in ("blue", "red"):
         team = tn[side]
@@ -301,7 +309,7 @@ print(f"feature pass done: {len(decisions)} decisions, {time.time()-t0:.0f}s", f
 from scipy.optimize import minimize
 END = max(d["t"] for d in decisions)
 H_OBS = 30.0
-BAN_F = ["cap","thr","revu","revw","map","den","selfban"]
+BAN_F = ["cap","thr","revu","revw","map","selfban"]  # denial dropped (league-negative)
 PROT_F = ["cap","ls","ownw","map","selfprot","haz"]
 SLOTS = {"ban": ["B1","B2","B3","B4"], "protect": ["P1","P2"]}
 RHO_BAN = 0.90
@@ -379,9 +387,9 @@ for kind, slots in SLOTS.items():
     for sl in slots:
         alphas[sl] = [round(float(x),4) for x in alpha_asof(sl)]
         alphas_slow[sl] = [round(float(x),4) for x in alpha_asof_slow(sl)]
-coef = {"ban": {sl: {nm: round(float(bw[j]),4) for j, nm in enumerate(BAN_F)} for sl in SLOTS["ban"]},
+coef = {"ban": {sl: dict({nm: round(float(bw[j]),4) for j, nm in enumerate(BAN_F)}, den=0.0) for sl in SLOTS["ban"]},
         "protect": {sl: {nm: round(float(pw[j]),4) for j, nm in enumerate(PROT_F)} for sl in SLOTS["protect"]}}
-out = {"fitted_on": "868 maps through 2026-08-01; hybrid: time-credited usage, ban habit two-clock mix (rho .90), anticipatory protects (hazard), slot temperatures",
+out = {"fitted_on": "868 maps; hybrid v2: exposure-adjusted ban habit (chosen-given-available), dedup-fixed state, denial removed, time-credited usage, two-clock mix (rho .90), hazard protects, slot temperatures",
     "tau": TAU, "patterns": [[list(c), r] for c, r in PATTERNS],
     "coef": coef,
     "temps": {"ban": {sl: round(math.exp(blT[k]),3) for sl,k in bsx.items()},
