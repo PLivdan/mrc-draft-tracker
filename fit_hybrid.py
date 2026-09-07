@@ -268,17 +268,11 @@ for ri, r in enumerate(recs):
         else: team_protc[tm][i] += 1
         slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
         kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
-        tm = tn[a["side"]]
-        if a["kind"] == "ban": team_banc[tm][i] += 1
-        else: team_protc[tm][i] += 1
-        slot_cS[a["slot"]][i] += 1; slot_nS[a["slot"]] += 1
-        kind_cS[a["kind"]][i] += 1; kind_nS[a["kind"]] += 1
     mp = r.get("map_name")
     for side in ("blue", "red"):
         team = tn[side]
         won = r.get("winner_side") == side
         team_use[team] *= DELTA; team_win[team] *= DELTA
-        team_banc[team] *= DELTA; team_protc[team] *= DELTA
         team_banc[team] *= DELTA; team_protc[team] *= DELTA
         team_time[team] *= DELTA; team_n[team] = team_n[team] * DELTA + 1
         credit = {}
