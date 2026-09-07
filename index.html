@@ -368,6 +368,7 @@ function hazardVector(side, slot, bansBy, protsBy, ctx) {
       var rw = (ru && ooOppWon) ? 1 : 0;
       var u = MODEL.alpha[osl][i] + c.cap * me.cap[i] + c.thr * me.thr[i] +
               c.revu * ru + c.revw * rw + c.selfban * banner.sb[i] +
+              (c.bb || 0) * (bansBy[side].indexOf(hh) >= 0 ? 1 : 0) +
               c.map * mapOffset(i);
       us.push(u / T); idxs.push(i);
     });
@@ -393,9 +394,6 @@ function predictAction(act, bansBy, protsBy) {
     var oppSide = opp(side);
     var tp = teamParams(teamKey(oppSide));
     var me = teamParams(teamKey(side));
-    var pool = HEROES.filter(function (h) { return bansBy[side].indexOf(h) < 0; });
-    var key = side + "|" + bansBy[side].slice().sort().join(",") + "|" + (teamKey(oppSide) || "?");
-    var D = denialValues(pool, tp.v, MODEL.tau, key);
     var oppWon = ctx.winner === oppSide;
     legal.forEach(function (h) {
       var i = HIDX[h];
@@ -405,7 +403,7 @@ function predictAction(act, bansBy, protsBy) {
         thr: (c.cap * tp.cap[i] + c.thr * tp.thr[i]) / T,
         self: c.selfban * me.sb[i] / T,
         rev: (c.revu * ru + c.revw * rw) / T,
-        den: c.den * (D[h] || 0) / T,
+        den: (c.bb || 0) * (bansBy[oppSide].indexOf(h) >= 0 ? 1 : 0) / T,
         map: c.map * mapOffset(i) / T } });
     });
   } else {
@@ -596,7 +594,7 @@ function recompute() {
         teamName(a.side) + "</span> " + a.kind + " " + a.slot + " forecast</th></tr>" +
         "<tr><th></th><th>hero</th><th>P</th><th>α</th><th>" + prefHdr + "</th><th>self</th>" +
         (hasSeries ? "<th>series</th>" : "") +
-        "<th>" + (a.kind === "ban" ? "κD" : "hazard") + "</th>" + (hasMap ? "<th>map</th>" : "") + "</tr>";
+        "<th>" + (a.kind === "ban" ? "back" : "hazard") + "</th>" + (hasMap ? "<th>map</th>" : "") + "</tr>";
       rows.slice(0, 8).forEach(function (r, k) {
         var w = Math.max(1, Math.round(r.p * 160));
         html += '<tr class="pick" data-act="' + a.id + '" data-hero="' + r.hero + '">' +

@@ -3,11 +3,14 @@ DRAFT_ROOT = os.environ.get("DRAFT_ROOT", "/Users/dlivdan/projects/marvel-draft-
 """Chronological variant evaluation for the tracker model.
 One as-of feature pass over all decisions, then per-variant weighted conditional
 logit fits with block refits; holdout = last 45 series (July-Aug incl. MSF)."""
-import json, glob, math, time
+import calendar, json, glob, math, sys, time
 import numpy as np
 from collections import defaultdict
 
 t0 = time.time()
+def _pt(m, d): return calendar.timegm((2026, m, d, 9, 0, 0))
+MAJOR_BREAKS = [_pt(5,13), _pt(7,2), _pt(7,11), _pt(8,6), _pt(8,19)]
+PHI = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
 roles = json.load(open(DRAFT_ROOT + "/data/roles/heroes.json"))
 HEROES = sorted(roles); HIDX = {h: i for i, h in enumerate(HEROES)}
 NH = len(HEROES)
@@ -152,6 +155,13 @@ for ri, r in enumerate(recs):
         for k in kind_cS: kind_cS[k] *= fS
         for k in kind_nS: kind_nS[k] *= fS
         g_num *= f; g_den *= f
+        for bts in MAJOR_BREAKS:
+            if last_t < bts <= t:
+                for k in slot_c: slot_c[k] *= PHI
+                for k in list(slot_n): slot_n[k] *= PHI
+                for k in kind_c: kind_c[k] *= PHI
+                for k in kind_n: kind_n[k] *= PHI
+                for k in slot_avail: slot_avail[k] *= PHI
         fm = time_decay((t - last_t) / DAY, H_MAP)
         for k in map_c: map_c[k] *= fm
         for k in list(map_n): map_n[k] *= fm
@@ -206,9 +216,12 @@ for ri, r in enumerate(recs):
                 if key not in dcache:
                     dcache[key] = denial_asof(vteam[oside], bans[side])
                 D = dcache[key]
+                bbv = np.zeros(NH)
+                for _h in bans[oside]:
+                    bbv[HIDX[_h]] = 1.0
                 feats = {"cap": caps[oside], "thr": thr[oside],
                          "revu": rev_used[side], "revw": rev_won[side],
-                         "map": mo, "den": D, "selfban": selfb[side]}
+                         "map": mo, "den": D, "selfban": selfb[side], "bb": bbv}
             else:
                 legal = [i for i in range(NH)
                          if HEROES[i] not in bans[oside] and HEROES[i] not in prots[side]]
@@ -226,11 +239,14 @@ for ri, r in enumerate(recs):
                 oo, oslots = HAZ_WIN[(side, slot)]
                 banmask = np.array([HEROES[i] not in bans[oo] and HEROES[i] not in prots[side]
                                     for i in range(NH)])
+                _bb2 = np.zeros(NH)
+                for _h in bans[side]:
+                    _bb2[HIDX[_h]] = 1.0
                 look = {"slots": oslots, "mask": banmask,
                         "alpha": {osl: alpha_asof(osl) for osl in oslots},
                         "cap": caps[side], "thr": thr[side],
                         "revu": rev_used[oo], "revw": rev_won[oo],
-                        "selfban": selfb[oo], "map": mo}
+                        "selfban": selfb[oo], "map": mo, "bb": _bb2}
             if kind == "ban" and (side, slot) in URG_WIN:
                 oo, oslots = URG_WIN[(side, slot)]
                 pmask = np.array([HEROES[i] not in bans[side] and HEROES[i] not in prots[oo]
@@ -309,7 +325,7 @@ print(f"feature pass done: {len(decisions)} decisions, {time.time()-t0:.0f}s", f
 from scipy.optimize import minimize
 END = max(d["t"] for d in decisions)
 H_OBS = 30.0
-BAN_F = ["cap","thr","revu","revw","map","selfban"]  # denial dropped (league-negative)
+BAN_F = ["cap","thr","revu","revw","map","selfban","bb"]  # denial dropped; bb = ban-back mechanism
 PROT_F = ["cap","ls","ownw","map","selfprot","haz"]
 SLOTS = {"ban": ["B1","B2","B3","B4"], "protect": ["P1","P2"]}
 RHO_BAN = 0.90
@@ -389,7 +405,7 @@ for kind, slots in SLOTS.items():
         alphas_slow[sl] = [round(float(x),4) for x in alpha_asof_slow(sl)]
 coef = {"ban": {sl: dict({nm: round(float(bw[j]),4) for j, nm in enumerate(BAN_F)}, den=0.0) for sl in SLOTS["ban"]},
         "protect": {sl: {nm: round(float(pw[j]),4) for j, nm in enumerate(PROT_F)} for sl in SLOTS["protect"]}}
-out = {"fitted_on": "868 maps; hybrid v3: exposure-adjusted habits on ALL six slots (chosen-given-available), fixed team-history recurrence, denial removed, time-credited usage, hazard protects, slot temperatures. Note: revu/revw = recent-opponent-use + outcome differential (predictive, not revenge)",
+out = {"fitted_on": "868 maps; hybrid v4: patch-punctuated clocks (major balance patches, extra discount) + ban-back mechanism + all-slot exposure habits, fixed recurrence, denial removed, hazard protects, slot temperatures",
     "tau": TAU, "patterns": [[list(c), r] for c, r in PATTERNS],
     "coef": coef,
     "temps": {"ban": {sl: round(math.exp(blT[k]),3) for sl,k in bsx.items()},
