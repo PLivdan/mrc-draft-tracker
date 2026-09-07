@@ -1,4 +1,5 @@
 import os
+DRAFT_ROOT = os.environ.get("DRAFT_ROOT", "/Users/dlivdan/projects/marvel-draft-model")
 """Chronological variant evaluation for the tracker model.
 One as-of feature pass over all decisions, then per-variant weighted conditional
 logit fits with block refits; holdout = last 45 series (July-Aug incl. MSF)."""
@@ -7,7 +8,7 @@ import numpy as np
 from collections import defaultdict
 
 t0 = time.time()
-roles = json.load(open("/Users/dlivdan/projects/marvel-draft-model/data/roles/heroes.json"))
+roles = json.load(open(DRAFT_ROOT + "/data/roles/heroes.json"))
 HEROES = sorted(roles); HIDX = {h: i for i, h in enumerate(HEROES)}
 NH = len(HEROES)
 ROLE_ORDER = ["Vanguard", "Duelist", "Strategist"]
@@ -20,7 +21,7 @@ H_MAP = 30.0
 DELTA = 0.88        # per-team-map decay (spec)
 
 recs = []
-for f in glob.glob("/Users/dlivdan/projects/marvel-draft-model/data/processed/maps/*.json"):
+for f in glob.glob(DRAFT_ROOT + "/data/processed/maps/*.json"):
     r = json.load(open(f))
     if r.get("qa", {}).get("status") == "pass":
         recs.append(r)
