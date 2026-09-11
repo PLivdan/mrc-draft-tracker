@@ -1,0 +1,1840 @@
+{
+  "generated_at": "2026-09-11T18:49:10.186821+00:00",
+  "data": {
+    "maps": 868,
+    "series": 314,
+    "excluded_maps": 16,
+    "first_seen": 1774621389,
+    "last_seen": 1785627442,
+    "teams": {
+      "100 Thieves": {
+        "maps": 49,
+        "last_seen": 1785459103
+      },
+      "AAAd": {
+        "maps": 35,
+        "last_seen": 1782544757
+      },
+      "Aconyx": {
+        "maps": 58,
+        "last_seen": 1785363624
+      },
+      "AimMiracle.X": {
+        "maps": 31,
+        "last_seen": 1782549198
+      },
+      "Alter Esports": {
+        "maps": 22,
+        "last_seen": 1780850460
+      },
+      "BLACK CAT": {
+        "maps": 26,
+        "last_seen": 1780749995
+      },
+      "Bxiom Japan": {
+        "maps": 6,
+        "last_seen": 1777189001
+      },
+      "Chiefs Esports Club": {
+        "maps": 44,
+        "last_seen": 1782552496
+      },
+      "CrownFall": {
+        "maps": 23,
+        "last_seen": 1780770211
+      },
+      "DXA Esports": {
+        "maps": 14,
+        "last_seen": 1779436160
+      },
+      "Equinox Gaming": {
+        "maps": 12,
+        "last_seen": 1780875171
+      },
+      "FL eSports Club": {
+        "maps": 59,
+        "last_seen": 1782567811
+      },
+      "FURY": {
+        "maps": 22,
+        "last_seen": 1779530297
+      },
+      "FYR Strays": {
+        "maps": 42,
+        "last_seen": 1783099379
+      },
+      "FlyQuest": {
+        "maps": 23,
+        "last_seen": 1783208929
+      },
+      "Gen.G Esports": {
+        "maps": 55,
+        "last_seen": 1785538674
+      },
+      "JFT Esports": {
+        "maps": 21,
+        "last_seen": 1779615585
+      },
+      "Kanga Esports": {
+        "maps": 27,
+        "last_seen": 1779521051
+      },
+      "Liquid Citadel": {
+        "maps": 64,
+        "last_seen": 1785627442
+      },
+      "Loyalty": {
+        "maps": 15,
+        "last_seen": 1780818566
+      },
+      "LuneX Gaming": {
+        "maps": 8,
+        "last_seen": 1776553920
+      },
+      "Lunex Gaming": {
+        "maps": 3,
+        "last_seen": 1776379635
+      },
+      "N1HEX": {
+        "maps": 23,
+        "last_seen": 1782459332
+      },
+      "NOT BAD": {
+        "maps": 40,
+        "last_seen": 1782554006
+      },
+      "NRG Shock": {
+        "maps": 22,
+        "last_seen": 1780888742
+      },
+      "NTMR": {
+        "maps": 9,
+        "last_seen": 1780797036
+      },
+      "Natus Vincere": {
+        "maps": 64,
+        "last_seen": 1785627442
+      },
+      "OUG": {
+        "maps": 55,
+        "last_seen": 1785464916
+      },
+      "PIRATES": {
+        "maps": 12,
+        "last_seen": 1777198493
+      },
+      "Pulsar Esports": {
+        "maps": 33,
+        "last_seen": 1783181085
+      },
+      "RAD": {
+        "maps": 71,
+        "last_seen": 1785616465
+      },
+      "REJECT": {
+        "maps": 53,
+        "last_seen": 1785369417
+      },
+      "RE_VOLT": {
+        "maps": 2,
+        "last_seen": 1779363889
+      },
+      "Reason Gaming": {
+        "maps": 28,
+        "last_seen": 1783106659
+      },
+      "Rival Esports": {
+        "maps": 21,
+        "last_seen": 1780830850
+      },
+      "SLZZ": {
+        "maps": 52,
+        "last_seen": 1782645393
+      },
+      "Sentinels": {
+        "maps": 38,
+        "last_seen": 1783130294
+      },
+      "Shikigami": {
+        "maps": 57,
+        "last_seen": 1783176273
+      },
+      "Spacestation Gaming": {
+        "maps": 21,
+        "last_seen": 1780881828
+      },
+      "Stickdrift": {
+        "maps": 21,
+        "last_seen": 1783215179
+      },
+      "Swamp Gaming": {
+        "maps": 58,
+        "last_seen": 1785544521
+      },
+      "THE LIONS": {
+        "maps": 11,
+        "last_seen": 1780853880
+      },
+      "TSM": {
+        "maps": 19,
+        "last_seen": 1783135984
+      },
+      "Team Heretics": {
+        "maps": 57,
+        "last_seen": 1783188487
+      },
+      "Team Peps": {
+        "maps": 17,
+        "last_seen": 1776441530
+      },
+      "Team Rise": {
+        "maps": 28,
+        "last_seen": 1780832454
+      },
+      "Team Vision": {
+        "maps": 15,
+        "last_seen": 1776434659
+      },
+      "The Burgers": {
+        "maps": 21,
+        "last_seen": 1782464292
+      },
+      "The Chosen Ones": {
+        "maps": 13,
+        "last_seen": 1780857923
+      },
+      "Virtus.pro": {
+        "maps": 61,
+        "last_seen": 1785531283
+      },
+      "Vulcan Red": {
+        "maps": 13,
+        "last_seen": 1779530297
+      },
+      "XOXO01": {
+        "maps": 45,
+        "last_seen": 1782643420
+      },
+      "Yeah We Lost": {
+        "maps": 46,
+        "last_seen": 1783221383
+      },
+      "Zero Tenacity": {
+        "maps": 51,
+        "last_seen": 1782567252
+      }
+    }
+  },
+  "records_sha256": "f65eea994220af9ea95257eddbdc84de79de97550503b192864b0afd9ce26d41",
+  "baseline_config": {
+    "dp": 0.88,
+    "kp": 2.0,
+    "kt": 50.0,
+    "exposure": true,
+    "role_pooling": 0.0,
+    "protect": 1.0,
+    "map": 0.5,
+    "alternative_min": 0.1
+  },
+  "selected_config": {
+    "dp": 0.88,
+    "kp": 2.0,
+    "kt": 50.0,
+    "exposure": true,
+    "role_pooling": 1.0,
+    "protect": 1.0,
+    "map": 0.5,
+    "alternative_min": 0.1
+  },
+  "validation": {
+    "status": "historical_replay_not_untouched_holdout",
+    "protocol": "Chronological per-map state updates; known recorded rosters; whole-series development split; parameters selected before replay scoring.",
+    "target": "Per-player map-level hero playtime share; unique primary boxes are a presentation constraint, not a joint lineup probability.",
+    "limitations": [
+      "The 45-series replay window has been reused in earlier repository experiments.",
+      "Metrics assume the recorded roster is known; last-known roster overlap is reported separately.",
+      "Per-map refresh in this replay is more frequent than a static website export.",
+      "Historical hero availability is not supplied. Exposure is adjusted for observed bans, not release or event eligibility.",
+      "These probabilities do not measure win-rate effects or the value of forcing a ban."
+    ],
+    "inner_series": 44,
+    "inner_maps": 121,
+    "replay_series": 45,
+    "replay_maps": 157,
+    "replay_start": 1782649485,
+    "replay_end": 1785627442,
+    "stages": {
+      "opening": {
+        "n": 1884,
+        "ce": 2.1698382143325294,
+        "primary": 0.3381104033970276,
+        "either": 0.5265392781316348,
+        "coverage": 0.49620097569390803,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "first_protects": {
+        "n": 1884,
+        "ce": 2.064508267873475,
+        "primary": 0.3667728237791932,
+        "either": 0.5567940552016986,
+        "coverage": 0.5283075055524694,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "second_blind_bans": {
+        "n": 1884,
+        "ce": 1.9937130668537941,
+        "primary": 0.39278131634819535,
+        "either": 0.5881104033970276,
+        "coverage": 0.5589156042837015,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "complete": {
+        "n": 1884,
+        "ce": 1.8906831445402268,
+        "primary": 0.4463906581740977,
+        "either": 0.6289808917197452,
+        "coverage": 0.5979839350350591,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      }
+    }
+  },
+  "metrics": {
+    "opening": {
+      "corrected_baseline": {
+        "n": 1884,
+        "ce": 2.28894551849311,
+        "primary": 0.3381104033970276,
+        "either": 0.5249469214437368,
+        "coverage": 0.49459447805090917,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "selected": {
+        "n": 1884,
+        "ce": 2.1698382143325294,
+        "primary": 0.3381104033970276,
+        "either": 0.5265392781316348,
+        "coverage": 0.49620097569390803,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      }
+    },
+    "first_protects": {
+      "corrected_baseline": {
+        "n": 1884,
+        "ce": 2.1864156194751483,
+        "primary": 0.3678343949044586,
+        "either": 0.5504246284501062,
+        "coverage": 0.5222697230721438,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "selected": {
+        "n": 1884,
+        "ce": 2.064508267873475,
+        "primary": 0.3667728237791932,
+        "either": 0.5567940552016986,
+        "coverage": 0.5283075055524694,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      }
+    },
+    "second_blind_bans": {
+      "corrected_baseline": {
+        "n": 1884,
+        "ce": 2.1168333499178567,
+        "primary": 0.39437367303609344,
+        "either": 0.5801486199575372,
+        "coverage": 0.5515121121430262,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "selected": {
+        "n": 1884,
+        "ce": 1.9937130668537941,
+        "primary": 0.39278131634819535,
+        "either": 0.5881104033970276,
+        "coverage": 0.5589156042837015,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      }
+    },
+    "complete": {
+      "corrected_baseline": {
+        "n": 1884,
+        "ce": 2.016314174245799,
+        "primary": 0.4463906581740977,
+        "either": 0.6204883227176221,
+        "coverage": 0.5890321497949496,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      },
+      "selected": {
+        "n": 1884,
+        "ce": 1.8906831445402268,
+        "primary": 0.4463906581740977,
+        "either": 0.6289808917197452,
+        "coverage": 0.5979839350350591,
+        "roster_known": 0.9930997876857749,
+        "series": 45
+      }
+    }
+  },
+  "paired_differences": {
+    "opening": {
+      "ce": {
+        "change": -0.11910730416057881,
+        "series_bootstrap_95": [
+          -0.1332754991898416,
+          -0.10593513028160668
+        ]
+      },
+      "primary": {
+        "change": 0.0,
+        "series_bootstrap_95": [
+          -0.003691983122362869,
+          0.003789124800637952
+        ]
+      },
+      "either": {
+        "change": 0.0015923566878980893,
+        "series_bootstrap_95": [
+          -0.0016894764662621806,
+          0.0050335570469798654
+        ]
+      },
+      "coverage": {
+        "change": 0.001606497642998952,
+        "series_bootstrap_95": [
+          -0.0013600959038387432,
+          0.00473204365055477
+        ]
+      }
+    },
+    "first_protects": {
+      "ce": {
+        "change": -0.1219073516016784,
+        "series_bootstrap_95": [
+          -0.13651797643214184,
+          -0.1085678670671177
+        ]
+      },
+      "primary": {
+        "change": -0.0010615711252653928,
+        "series_bootstrap_95": [
+          -0.003941441441441441,
+          0.0017253607238933658
+        ]
+      },
+      "either": {
+        "change": 0.006369426751592357,
+        "series_bootstrap_95": [
+          0.0005375482492417977,
+          0.012238566648075846
+        ]
+      },
+      "coverage": {
+        "change": 0.006037782480325615,
+        "series_bootstrap_95": [
+          0.0009908013705684506,
+          0.010601160892005083
+        ]
+      }
+    },
+    "second_blind_bans": {
+      "ce": {
+        "change": -0.12312028306405767,
+        "series_bootstrap_95": [
+          -0.13740533386731887,
+          -0.10969662540993501
+        ]
+      },
+      "primary": {
+        "change": -0.0015923566878980893,
+        "series_bootstrap_95": [
+          -0.004777070063694267,
+          0.0015728277851219778
+        ]
+      },
+      "either": {
+        "change": 0.007961783439490446,
+        "series_bootstrap_95": [
+          0.0017123287671232876,
+          0.014141652372784448
+        ]
+      },
+      "coverage": {
+        "change": 0.007403492140674932,
+        "series_bootstrap_95": [
+          0.0022298519627698115,
+          0.01256089597649554
+        ]
+      }
+    },
+    "complete": {
+      "ce": {
+        "change": -0.12563102970557105,
+        "series_bootstrap_95": [
+          -0.13964179754635955,
+          -0.11230103938284026
+        ]
+      },
+      "primary": {
+        "change": 0.0,
+        "series_bootstrap_95": [
+          -0.0036458333333333334,
+          0.003765297821165808
+        ]
+      },
+      "either": {
+        "change": 0.008492569002123142,
+        "series_bootstrap_95": [
+          0.0020833333333333333,
+          0.014917695473251029
+        ]
+      },
+      "coverage": {
+        "change": 0.008951785240109164,
+        "series_bootstrap_95": [
+          0.0037915033176638227,
+          0.014550752008008965
+        ]
+      }
+    }
+  },
+  "development_base_grid": [
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.191037956648386,
+        "primary": 0.3856749311294766,
+        "either": 0.5971074380165289,
+        "coverage": 0.5685986467857564,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.154876239491281,
+        "primary": 0.384297520661157,
+        "either": 0.5977961432506887,
+        "coverage": 0.5694733024171073,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.136541354931212,
+        "primary": 0.38292011019283745,
+        "either": 0.5991735537190083,
+        "coverage": 0.5710695622322428,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.3005679668000716,
+        "primary": 0.3822314049586777,
+        "either": 0.5867768595041323,
+        "coverage": 0.5580714841512862,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.262495861290392,
+        "primary": 0.38016528925619836,
+        "either": 0.5888429752066116,
+        "coverage": 0.5605065387812341,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2432662446645755,
+        "primary": 0.38154269972451793,
+        "either": 0.5881542699724518,
+        "coverage": 0.5598902451366603,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.4530900793229673,
+        "primary": 0.3808539944903581,
+        "either": 0.5681818181818182,
+        "coverage": 0.5395943450968945,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.4135123902082194,
+        "primary": 0.38016528925619836,
+        "either": 0.5674931129476584,
+        "coverage": 0.5394534822888438,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.3942518344423642,
+        "primary": 0.38292011019283745,
+        "either": 0.5695592286501377,
+        "coverage": 0.5403774944490507,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.1455160789823324,
+        "primary": 0.3939393939393939,
+        "either": 0.6108815426997245,
+        "coverage": 0.5808191244000283,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.10944127560409,
+        "primary": 0.3939393939393939,
+        "either": 0.609504132231405,
+        "coverage": 0.579392763145414,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0911984754545907,
+        "primary": 0.3953168044077135,
+        "either": 0.6108815426997245,
+        "coverage": 0.5799278150157925,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2675999606968547,
+        "primary": 0.39118457300275483,
+        "either": 0.5977961432506887,
+        "coverage": 0.5691439242925975,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2295128105384956,
+        "primary": 0.39118457300275483,
+        "either": 0.5991735537190083,
+        "coverage": 0.57024219756071,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 5.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2102666417016423,
+        "primary": 0.38980716253443526,
+        "either": 0.6005509641873278,
+        "coverage": 0.5710422732483286,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.4300969881242107,
+        "primary": 0.3856749311294766,
+        "either": 0.5757575757575758,
+        "coverage": 0.5479673189769704,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.390449371997699,
+        "primary": 0.3856749311294766,
+        "either": 0.5771349862258953,
+        "coverage": 0.5488517063125868,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 10.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.371113974746305,
+        "primary": 0.3849862258953168,
+        "either": 0.5778236914600551,
+        "coverage": 0.5486939616388903,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.227674531502177,
+        "primary": 0.3381542699724518,
+        "either": 0.5523415977961432,
+        "coverage": 0.5308262890340902,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.193797480862792,
+        "primary": 0.33746556473829203,
+        "either": 0.5523415977961432,
+        "coverage": 0.5306080934050394,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.177325559438383,
+        "primary": 0.33608815426997246,
+        "either": 0.5537190082644629,
+        "coverage": 0.5314603042968616,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2757259777907195,
+        "primary": 0.3381542699724518,
+        "either": 0.5509641873278237,
+        "coverage": 0.5277618268411333,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.241453829786611,
+        "primary": 0.3381542699724518,
+        "either": 0.5509641873278237,
+        "coverage": 0.529341953122095,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.225026353863832,
+        "primary": 0.33608815426997246,
+        "either": 0.550275482093664,
+        "coverage": 0.5293487842064558,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 5.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.373463319341492,
+        "primary": 0.3443526170798898,
+        "either": 0.5509641873278237,
+        "coverage": 0.5278533039661014,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 20.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.338901641960258,
+        "primary": 0.34366391184573003,
+        "either": 0.5482093663911846,
+        "coverage": 0.5258565089906849,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 50.0,
+        "exposure": false,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.322891680435212,
+        "primary": 0.33746556473829203,
+        "either": 0.546831955922865,
+        "coverage": 0.5251736609283777,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.1773572974811315,
+        "primary": 0.34228650137741046,
+        "either": 0.5640495867768595,
+        "coverage": 0.543377037481258,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.1433742033673706,
+        "primary": 0.34228650137741046,
+        "either": 0.5647382920110193,
+        "coverage": 0.5437867090297419,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.126785552366872,
+        "primary": 0.34228650137741046,
+        "either": 0.5654269972451791,
+        "coverage": 0.543900047838417,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2371566360963553,
+        "primary": 0.34228650137741046,
+        "either": 0.5619834710743802,
+        "coverage": 0.5385274121929855,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2026225039179566,
+        "primary": 0.3402203856749311,
+        "either": 0.5619834710743802,
+        "coverage": 0.5385771990433295,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 5.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.18591038349638,
+        "primary": 0.33746556473829203,
+        "either": 0.5640495867768595,
+        "coverage": 0.5409463850394065,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 5.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.3449513609083152,
+        "primary": 0.3450413223140496,
+        "either": 0.5585399449035813,
+        "coverage": 0.5333983327529039,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 20.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.3100649178911477,
+        "primary": 0.34297520661157027,
+        "either": 0.5571625344352618,
+        "coverage": 0.5326115475334757,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.95,
+        "kp": 10.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.2937029554493304,
+        "primary": 0.33953168044077137,
+        "either": 0.5557851239669421,
+        "coverage": 0.5326265191455628,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    }
+  ],
+  "development_extension_grid": [
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0911984754545907,
+        "primary": 0.3953168044077135,
+        "either": 0.6108815426997245,
+        "coverage": 0.5799278150157925,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.071708890638983,
+        "primary": 0.4097796143250689,
+        "either": 0.6129476584022039,
+        "coverage": 0.58039812562534,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 0.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0868134106993668,
+        "primary": 0.4228650137741047,
+        "either": 0.6067493112947658,
+        "coverage": 0.5789612365794815,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 1.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0350410695058025,
+        "primary": 0.42424242424242425,
+        "either": 0.6170798898071626,
+        "coverage": 0.5848555918883959,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 1.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0073982508904282,
+        "primary": 0.4428374655647383,
+        "either": 0.6246556473829201,
+        "coverage": 0.590036093087428,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 1.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0125030627205716,
+        "primary": 0.4559228650137741,
+        "either": 0.628099173553719,
+        "coverage": 0.5957140304364269,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 2.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.1114749954076237,
+        "primary": 0.4325068870523416,
+        "either": 0.5826446280991735,
+        "coverage": 0.5483388337891933,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 2.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.074215368950295,
+        "primary": 0.4524793388429752,
+        "either": 0.5957300275482094,
+        "coverage": 0.5610968814417918,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.0,
+        "protect": 2.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0663721043774452,
+        "primary": 0.4696969696969697,
+        "either": 0.6026170798898072,
+        "coverage": 0.5684842380090213,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0177016992008654,
+        "primary": 0.3973829201101928,
+        "either": 0.6143250688705234,
+        "coverage": 0.5840298623032467,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 0.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9982795192755174,
+        "primary": 0.41046831955922863,
+        "either": 0.6198347107438017,
+        "coverage": 0.5866201303551555,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 0.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0132894151255076,
+        "primary": 0.42424242424242425,
+        "either": 0.6122589531680441,
+        "coverage": 0.5833974656005964,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 1.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.959047395184968,
+        "primary": 0.4256198347107438,
+        "either": 0.6177685950413223,
+        "coverage": 0.5862593710565309,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 1.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9316615429537503,
+        "primary": 0.4428374655647383,
+        "either": 0.6315426997245179,
+        "coverage": 0.5945979899173509,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 1.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.936901414944144,
+        "primary": 0.4573002754820937,
+        "either": 0.6308539944903582,
+        "coverage": 0.5971302509402453,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 2.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 2.0244428059151423,
+        "primary": 0.43388429752066116,
+        "either": 0.5909090909090909,
+        "coverage": 0.5569257650805003,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 2.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.988047391101032,
+        "primary": 0.4511019283746556,
+        "either": 0.6005509641873278,
+        "coverage": 0.5650219763232641,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 0.5,
+        "protect": 2.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9810469589000534,
+        "primary": 0.47107438016528924,
+        "either": 0.6122589531680441,
+        "coverage": 0.5774313826228504,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 0.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9707658860420794,
+        "primary": 0.39669421487603307,
+        "either": 0.6157024793388429,
+        "coverage": 0.585222252467478,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 0.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9514217265861211,
+        "primary": 0.41046831955922863,
+        "either": 0.6191460055096418,
+        "coverage": 0.5859271383430633,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 0.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9663218745820716,
+        "primary": 0.42699724517906334,
+        "either": 0.6108815426997245,
+        "coverage": 0.5820219782884196,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 1.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9092273273676754,
+        "primary": 0.4263085399449036,
+        "either": 0.6184573002754821,
+        "coverage": 0.5868752248226391,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 1.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.8821389007779674,
+        "primary": 0.44490358126721763,
+        "either": 0.6308539944903582,
+        "coverage": 0.5953168954134787,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 1.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.8875234642666308,
+        "primary": 0.45867768595041325,
+        "either": 0.6322314049586777,
+        "coverage": 0.5978840084254676,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 2.0,
+        "map": 0.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.960867074548986,
+        "primary": 0.4366391184573003,
+        "either": 0.5915977961432507,
+        "coverage": 0.5577549683029318,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 2.0,
+        "map": 0.5,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.925590954346298,
+        "primary": 0.45454545454545453,
+        "either": 0.6046831955922864,
+        "coverage": 0.5665150388254203,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    },
+    {
+      "config": {
+        "dp": 0.88,
+        "kp": 2.0,
+        "kt": 50.0,
+        "exposure": true,
+        "role_pooling": 1.0,
+        "protect": 2.0,
+        "map": 1.0,
+        "alternative_min": 0.1
+      },
+      "metrics": {
+        "n": 1452,
+        "ce": 1.9196065644561688,
+        "primary": 0.4724517906336088,
+        "either": 0.6129476584022039,
+        "coverage": 0.5757927005029054,
+        "roster_known": 0.987603305785124,
+        "series": 44
+      }
+    }
+  ],
+  "runtime_parity": {
+    "fixtures": 96,
+    "status": "passed"
+  }
+}
