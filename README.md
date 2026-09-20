@@ -2,8 +2,8 @@
 
 Live Marvel Rivals Championship ban/protect sheet with next-action forecasts,
 player hero pools, and conditional playtime forecasts. The embedded model is
-fitted on 947 QA-passed competitive maps from 345 series, March 27–September 20,
-2026, including the first 79 maps of Ignite 2026 Stage 2, which introduced a
+fitted on 951 QA-passed competitive maps from 347 series, March 27–September 20,
+2026, including the first 83 maps of Ignite 2026 Stage 2, which introduced a
 simultaneous fifth ban (stage 9, slot B5). The page drafts in that five-ban
 format; the bundled `league_bundle.tar.gz` still holds the 868-map four-ban
 history used by the lineup unit tests.
@@ -23,6 +23,32 @@ persist in browser storage.
 - The page shows the dataset date, last observed roster dates, and replay
   accuracy at the corresponding draft checkpoints.
 
+## Updating when new matches exist
+
+```bash
+python update.py            # add --commit to commit both repos; nothing is ever pushed
+```
+
+One guarded pass, in this order: refresh the research repo (`ingest fetch`,
+which re-reads every event page and archives only completed matches;
+`ingest discover`, which adds any new dated "Ignite 2026" event from the
+mrvl.net listing with a roster derived from hero release dates); scan the
+archived pages for heroes the roster lacks; `ingest build`. It halts — before
+touching the model — on an unknown hero, a roster gap, a draft-format change
+(any map with a structure other than the 12- or 14-action schedule), or a
+failed step. Then it scores the *currently embedded* model prospectively on
+every series played since its data cutoff (the `live` variant; the refit
+`share` variant alongside for reference) and appends that to
+`evaluation/prospective_log.json`, the permanent freeze-and-score record.
+Only then does it refit on everything, embed, refit the lineup boxes, and run
+the unit tests, printing the data delta and every coefficient that moved.
+
+Halts are deliberate: a new hero needs its role and release date in the
+research repo's `data/roles/`; a format change needs a design decision, not a
+refit. Hyperparameters (phi, half-lives) are frozen; retune only when a
+holdout says so. After a successful run, open the page locally once before
+pushing.
+
 ## Reproduce the ban/protect model
 
 `fit_draft.py` is the deployment harness for the ban/protect forecasts (hybrid
@@ -33,13 +59,13 @@ habit mixture for bans and hazard lookahead for protects.
 ```bash
 python -m unittest -v test_fit_draft.py
 python fit_draft.py fit --phi 0.25 --out evaluation/draft_params.json --embed index.html
-python fit_draft.py holdout --phi 0.25 --start 2026-09-17 --variants v4,own,share,pooled
+python fit_draft.py holdout --phi 0.25 --start 2026-09-17 --variants live,own,share,pooled
 python fit_draft.py fit --as-of 2026-08-01 --phi 0.25 --out /tmp/v4.json   # reproduces the v4 fit
 ```
 
 `--data-root` (or `DRAFT_ROOT`) points at the research repo; `--as-of` keeps
 maps played on or before a date and heroes released by then. `holdout` refits
-on everything before each block of five series and scores the block; `v4`
+on everything before each block of five series and scores the block; `live`
 freezes the coefficients embedded in `index.html`, and the `own`/`share`/
 `pooled` variants differ only in how the fifth ban is keyed (its own habit and
 temperature; B4's for both; or B4's habit with its own temperature).
@@ -93,7 +119,7 @@ Outputs are `evaluation/lineup_report.json` and
 `evaluation/lineup_params.json`. The latter is a reproducible intermediate and
 is ignored by Git; the deployment payload lives in `index.html`.
 `--embed` updates only lineup parameters, history, validation and provenance;
-the embedded ban/protect coefficients remain the existing v4 fit.
+the embedded ban/protect coefficients come from `fit_draft.py`.
 
 For newer processed data:
 

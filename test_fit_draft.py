@@ -217,6 +217,16 @@ class ExportTests(unittest.TestCase):
         self.assertIn("B5", pooled["temps"]["ban"])
 
 
+class BlockTests(unittest.TestCase):
+    def test_blocks_can_start_after_a_timestamp(self):
+        from fit_draft import series_blocks
+        decisions = [{"series": "a", "t": 100}, {"series": "b", "t": 160},
+                     {"series": "c", "t": 200}, {"series": "d", "t": 400}]
+        order = ["a", "b", "c", "d"]
+        self.assertEqual(series_blocks(order, decisions, after_ts=150, block=2), [["b", "c"], ["d"]])
+        self.assertEqual(series_blocks(order, decisions, after_ts=400, block=2), [])
+
+
 class EmbedTests(unittest.TestCase):
     def test_replaces_draft_keys_and_keeps_lineup_keys(self):
         old = {"coef": {"ban": {"B1": {"cap": 1.0}}}, "alpha": {"B1": [0.0]},

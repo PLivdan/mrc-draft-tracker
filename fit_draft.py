@@ -8,7 +8,7 @@ five-ban maps), filters heroes by release date, drops the denial DP whose
 coefficient was pinned at zero, and can embed its export into index.html.
 
     python fit_draft.py fit --phi 0.25 --out params.json [--embed index.html]
-    python fit_draft.py holdout --phi 0.25 --start 2026-09-17 --variants v4,own,share
+    python fit_draft.py holdout --phi 0.25 --start 2026-09-17 --variants live,own,share
 """
 import argparse, calendar, glob, json, math, os, re, time
 from collections import defaultdict
@@ -628,18 +628,38 @@ def format_result(label, tot, per_slot):
     return line
 
 
-def series_blocks(series_order, decisions, start=None, last=None, block=5):
+def series_blocks(series_order, decisions, start=None, last=None, block=5, after_ts=None):
     first_t = {}
     for d in decisions:
         first_t[d["series"]] = min(first_t.get(d["series"], d["t"]), d["t"])
+    chosen = list(series_order)
     if start is not None:
         t0 = _end_of_day(start) - DAY
-        chosen = [s for s in series_order if first_t.get(s, 0) >= t0]
-    else:
-        chosen = list(series_order)
+        chosen = [s for s in chosen if first_t.get(s, 0) >= t0]
+    if after_ts is not None:
+        chosen = [s for s in chosen if first_t.get(s, 0) > after_ts]
     if last is not None:
         chosen = chosen[-last:]
     return [chosen[i:i + block] for i in range(0, len(chosen), block)]
+
+
+def run_variant(variant, recs, heroes, roles, phi, model=None, dump=None, log=True, **block_args):
+    """Holdout for one variant: `live` freezes the coefficients of an embedded
+    modelData blob (scored on the slots it knows, with the hazard windows it
+    knows); the others refit before every block."""
+    if variant == "live":
+        fits = frozen_fits(model)
+        decisions, st = feature_pass(recs, heroes, roles, phi=phi, log=log,
+                                     p2_sees_b5="B5" in model["temps"]["ban"])
+        blocks = series_blocks(st.series_order, decisions, **block_args)
+        known = set(fits["ban"][2]) | set(fits["protect"][2])
+        tot, ps = run_holdout(decisions, st, blocks, st.NH, frozen=fits, log=log,
+                              scorable=lambda d: d["tkey"] in known, label=variant, dump=dump)
+    else:
+        decisions, st = feature_pass(recs, heroes, roles, phi=phi, log=log, **VARIANTS[variant])
+        blocks = series_blocks(st.series_order, decisions, **block_args)
+        tot, ps = run_holdout(decisions, st, blocks, st.NH, label=variant, dump=dump, log=log)
+    return tot, ps, blocks
 
 
 # ---------- CLI ----------
@@ -669,7 +689,7 @@ def main(argv=None):
     h.add_argument("--last", type=int, default=None, help="score only the last N chosen series")
     h.add_argument("--block", type=int, default=5)
     h.add_argument("--variants", default="own")
-    h.add_argument("--page", default="index.html", help="page whose embedded coefficients the v4 variant freezes")
+    h.add_argument("--page", default="index.html", help="page whose embedded coefficients the `live` variant freezes")
     h.add_argument("--dump", default=None, help="write per-decision losses by variant to this JSON file")
     args = ap.parse_args(argv)
 
@@ -697,21 +717,11 @@ def main(argv=None):
         return
 
     results, dumps = {}, {}
+    model = json.loads(_MODEL_RE.search(Path(args.page).read_text()).group(2))
     for variant in args.variants.split(","):
         dump = dumps.setdefault(variant, [])
-        if variant == "v4":
-            model = json.loads(_MODEL_RE.search(Path(args.page).read_text()).group(2))
-            fits = frozen_fits(model)
-            decisions, st = feature_pass(recs, heroes, roles, phi=args.phi, p2_sees_b5=False, log=True)
-            blocks = series_blocks(st.series_order, decisions, args.start, args.last, args.block)
-            known = set(fits["ban"][2]) | set(fits["protect"][2])
-            tot, ps = run_holdout(decisions, st, blocks, st.NH, frozen=fits,
-                                  scorable=lambda d: d["tkey"] in known, label=variant, dump=dump)
-        else:
-            decisions, st = feature_pass(recs, heroes, roles, phi=args.phi, log=True,
-                                         **VARIANTS[variant])
-            blocks = series_blocks(st.series_order, decisions, args.start, args.last, args.block)
-            tot, ps = run_holdout(decisions, st, blocks, st.NH, label=variant, dump=dump)
+        tot, ps, _ = run_variant(variant, recs, heroes, roles, args.phi, model=model, dump=dump,
+                                 start=args.start, last=args.last, block=args.block)
         results[variant] = format_result(variant, tot, ps)
         print(results[variant], flush=True)
     print("\n=== holdout summary ===")
